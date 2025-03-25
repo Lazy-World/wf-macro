@@ -1,4 +1,4 @@
-﻿#Requires AutoHotkey v2.0
+#Requires AutoHotkey v2.0
 
 ; Debug include
 #include %A_ScriptDir%/..
@@ -9,11 +9,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;              Settings               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-settingsJson    := FileRead(A_ScriptDir "\..\cfg\sttings.json")
-macroJson       := FileRead(A_ScriptDir "\..\cfg\test.json")
+settings_json    := FileRead(A_ScriptDir "\cfg\general_binds.json")
+macro_json       := FileRead(A_ScriptDir "\cfg\empty_ahk.json")
 
-global g_key      := json_load(&settingsJson)
-global g_macro    := json_load(&macroJson)
+global g_key      := json_load(&settings_json)
+global g_macro    := json_load(&macro_json)
 
 for hotkeyFunction, hotkeyCombination in g_macro["hotkeys"] {
     Hotkey("*" . hotkeyCombination, %hotkeyFunction%)
@@ -21,15 +21,7 @@ for hotkeyFunction, hotkeyCombination in g_macro["hotkeys"] {
 
 return
 
-AntiDesync(*) {
-    MsgBox("AntiDesync activated!")
-}
-
-EnergyDrain(*) {
-    MsgBox("EnergyDrain activated!" )
-}
-
-*F1::{                      
+testDelay(*) {
     local before := GetQPC()                                                            
     
     SendInput "{" g_macro["keys"]["tab"] "}"

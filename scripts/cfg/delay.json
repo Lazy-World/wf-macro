@@ -1,7 +1,6 @@
 {
     "hotkeys": {
-      "AntiDesync": "F1",
-      "EnergyDrain": "F2"
+      "testDelay": "F1"
     },
     "keys": {
       "tab": "Tab"
