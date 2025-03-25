@@ -45,6 +45,7 @@ lSleep(s_time, &start := unset) {
 }
 
 ; Измерение прошедшего времени между двумя метками
+; begin/end – две метки QPC, возвращается округлённая разница в миллисекундах
 MeasureTime(&begin, &t_end := unset) {
     global Frequency
     if (!Frequency)
@@ -54,16 +55,14 @@ MeasureTime(&begin, &t_end := unset) {
     return Round((1000 * (t_end - begin) / Frequency), 3)
 }
 
-; begin/end – две метки QPC, возвращается округлённая разница в миллисекундах
-
 ; Удерживание клавиши заданное время и ожидание после (если нужно)
 ; keyName – имя клавиши или vk-код, распознаваемый AHK
 ; duration – время удерживания клавиши
 ; wait – время ожидания после отпускания клавиши
 HoldKey(keyName, duration, wait := 0) {
-    Send("{%" keyName "% down}")
+    SendInput("{%" keyName "% down}")
     lSleep(duration)
-    Send("{%" keyName "% up}")
+    SendInput("{%" keyName "% up}")
     lSleep(wait)
 }
 
@@ -97,7 +96,7 @@ TimedKeyLoop(keyName, timeBetweenInputs, endTime, &start := unset) {
 }
 
 ; Пример измерения времени выполнения фрагмента кода:
-
+/*
 F1::{
     local before := GetQPC()
     ; Пример: задержка в 2 мс
@@ -105,4 +104,4 @@ F1::{
     local after := GetQPC()
     MsgBox(1000 * (after - before) / Frequency)
 }
-/**/
+*/

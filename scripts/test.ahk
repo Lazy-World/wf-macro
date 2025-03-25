@@ -5,16 +5,38 @@
 
 #include lib\headers.ahk
 #include lib\time.ahk
-#include lib\json.ahk 
 
-configText := FileRead(A_ScriptDir "\cfg\test.json")
-config := JSON.Load(configText)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;              Settings               ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+settingsJson    := FileRead(A_ScriptDir "\..\cfg\sttings.json")
+macroJson       := FileRead(A_ScriptDir "\..\cfg\test.json")
 
-MyGui := Gui()
-MyGui.Add("Text",, "Please enter your name:")
-MyGui.AddEdit("vName")
-MyGui.Show()
+global g_key      := json_load(&settingsJson)
+global g_macro    := json_load(&macroJson)
 
-Send "{keys.tab}"
+for hotkeyFunction, hotkeyCombination in g_macro["hotkeys"] {
+    Hotkey("*" . hotkeyCombination, %hotkeyFunction%)
+}
 
 return
+
+AntiDesync(*) {
+    MsgBox("AntiDesync activated!")
+}
+
+EnergyDrain(*) {
+    MsgBox("EnergyDrain activated!" )
+}
+
+*F1::{                      
+    local before := GetQPC()                                                            
+    
+    SendInput "{" g_macro["keys"]["tab"] "}"
+
+    local after := GetQPC()
+    MsgBox(1000 * (after - before) / Frequency)
+}
+
+*Insert::Reload
+*Del::ExitApp

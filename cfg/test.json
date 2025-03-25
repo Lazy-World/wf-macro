@@ -1,5 +1,10 @@
 {
+    "hotkeys": {
+      "AntiDesync": "F1",
+      "EnergyDrain": "F2"
+    },
     "keys": {
-        "tab": "Tab"
+      "tab": "Tab"
     }
-}
+  }
+  

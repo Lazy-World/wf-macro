@@ -1,0 +1,41 @@
+{
+    "misc": {
+        "fps": 144,
+        "fpsLock": "PgDn",
+        "fpsUncap": "Up"
+    },
+    "game": {
+        "shoot": "F9",
+        "shoot2": "F10",
+        "aim": "[",
+        "melee": "e",
+        "switch": "f",
+        "jump": "Space",
+        "shift": "Shift",
+        "sprint": "o",
+        "crouch": "Ctrl",
+        "operator": "]",
+        "use": "x",
+        "chat": "t"
+    },
+    "movement": {
+        "w": "w",
+        "a": "a",
+        "s": "s",
+        "d": "d"
+    },
+    "abilities": {
+        "firstA": "1",
+        "secondA": "2",
+        "thirdA": "3",
+        "fourthA": "4"
+    },
+    "gear": {
+        "archwing": "c",
+        "scanner": "ScrollLock",
+        "energyPad": "5",
+        "hack": "y",
+        "emote": "F7",
+        "emote2": "F8"
+    }
+}

@@ -1,375 +1,208 @@
-/**
- * Lib: JSON.ahk
- *     JSON lib for AutoHotkey.
- * Version:
- *     v2.1.3 [updated 04/18/2016 (MM/DD/YYYY)]
- * License:
- *     WTFPL [http://wtfpl.net/]
- * Requirements:
- *     Latest version of AutoHotkey (v1.1+ or v2.0-a+)
- * Installation:
- *     Use #Include JSON.ahk or copy into a function library folder and then
- *     use #Include <JSON>
- * Links:
- *     GitHub:     - https://github.com/cocobelgica/AutoHotkey-JSON
- *     Forum Topic - http://goo.gl/r0zI8t
- *     Email:      - cocobelgica <at> gmail <dot> com
- */
- #Requires AutoHotkey v2.0
+﻿;;;; AHK v2
+; Example ===================================================================================
+; ===========================================================================================
 
+; Msgbox "The idea here is to create several nested arrays, save to text with json_dump(), and then reload the array with json_load().  The resulting array should be the same.`r`n`r`nThis is what this example shows."
+; a := Map(), b := Map(), c := Map(), d := Map(), e := Map(), f := Map() ; Object() is more technically correct than {} but both will work.
 
-/**
- * Class: JSON
- *     The JSON object contains methods for parsing JSON and converting values
- *     to JSON. Callable - NO; Instantiable - YES; Subclassable - YES;
- *     Nestable(via #Include) - NO.
- * Methods:
- *     Load() - see relevant documentation before method definition header
- *     Dump() - see relevant documentation before method definition header
- */
-class JSON
-{
-	/**
-	 * Method: Load
-	 *     Parses a JSON string into an AHK value
-	 * Syntax:
-	 *     value := JSON.Load( text [, reviver ] )
-	 * Parameter(s):
-	 *     value      [retval] - parsed value
-	 *     text    [in, ByRef] - JSON formatted string
-	 *     reviver   [in, opt] - function object, similar to JavaScript's
-	 *                           JSON.parse() 'reviver' parameter
-	 */
-	class Load extends JSON.Functor
-	{
-		Call(self, ByRef text, reviver:="")
-		{
-			this.rev := IsObject(reviver) ? reviver : false
-		; Object keys(and array indices) are temporarily stored in arrays so that
-		; we can enumerate them in the order they appear in the document/text instead
-		; of alphabetically. Skip if no reviver function is specified.
-			this.keys := this.rev ? {} : false
+; d["g"] := 1, d["h"] := 2, d["i"] := ["purple","pink","pippy red"]
+; e["g"] := 1, e["h"] := 2, e["i"] := Map("1","test1","2","test2","3","test3")
+; f["g"] := 1, f["h"] := 2, f["i"] := [1,2,Map("a",1.0009,"b",2.0003,"c",3.0001)]
 
-			static quot := Chr(34), bashq := "\" . quot
-			     , json_value := quot . "{[01234567890-tfn"
-			     , json_value_or_array_closing := quot . "{[]01234567890-tfn"
-			     , object_key_or_object_closing := quot . "}"
+; a["test1"] := "test11", a["d"] := d
+; b["test3"] := "test33", b["e"] := e
+; c["test5"] := "test55", c["f"] := f
 
-			key := ""
-			is_key := false
-			root := {}
-			stack := [root]
-			next := json_value
-			pos := 0
+; myObj := Map()
+; myObj["a"] := a, myObj["b"] := b, myObj["c"] := c, myObj["test7"] := "test77", myObj["test8"] := "test88"
 
-			while ((ch := SubStr(text, ++pos, 1)) != "") {
-				if InStr(" `t`r`n", ch)
+; g := ["blue","green","red"], myObj["h"] := g ; add linear array for testing
+
+; q := Chr(34)
+; textData2 := json_dump(myObj,4) ; ===> convert array to JSON
+; msgbox "JSON output text:`r`n===========================================`r`n(Should match second output.)`r`n`r`n" textData2
+
+; newObj := json_load(&textData2) ; ===> convert json back to array
+
+; textData3 := json_dump(newObj,4) ; ===> break down array into 2D layout again, should be identical
+; msgbox "Second output text:`r`n===========================================`r`n(should be identical to first output)`r`n`r`n" textData3
+
+; msgbox "textData2 = textData3:  " ((textData2=textData3) ? "true" : "false")
+
+; ===========================================================================================
+; End Example ; =============================================================================
+; ===========================================================================================
+
+; originally posted by user coco on AutoHotkey.com
+; https://github.com/cocobelgica/AutoHotkey-JSON
+
+json_load(&src, args*) {
+	key := "", is_key := false
+	stack := [ tree := [] ]
+	next := '"{[01234567890-tfn'
+	pos := 0
+	
+	while ( (ch := SubStr(src, ++pos, 1)) != "" ) {
+		if InStr(" `t`n`r", ch)
+			continue
+		if !InStr(next, ch, true) {
+			testArr := StrSplit(SubStr(src, 1, pos), "`n")
+			
+			ln := testArr.Length
+			col := pos - InStr(src, "`n",, -(StrLen(src)-pos+1))
+
+			msg := Format("{}: line {} col {} (char {})"
+			,   (next == "")      ? ["Extra data", ch := SubStr(src, pos)][1]
+			  : (next == "'")     ? "Unterminated string starting at"
+			  : (next == "\")     ? "Invalid \escape"
+			  : (next == ":")     ? "Expecting ':' delimiter"
+			  : (next == '"')     ? "Expecting object key enclosed in double quotes"
+			  : (next == '"}')    ? "Expecting object key enclosed in double quotes or object closing '}'"
+			  : (next == ",}")    ? "Expecting ',' delimiter or object closing '}'"
+			  : (next == ",]")    ? "Expecting ',' delimiter or array closing ']'"
+			  : [ "Expecting JSON value(string, number, [true, false, null], object or array)"
+			    , ch := SubStr(src, pos, (SubStr(src, pos)~="[\]\},\s]|$")-1) ][1]
+			, ln, col, pos)
+
+			throw Error(msg, -1, ch)
+		}
+		
+		obj := stack[1]
+        is_array := (obj is Array)
+		
+		if i := InStr("{[", ch) { ; start new object / map?
+			val := (i = 1) ? Map() : Array()	; ahk v2
+			
+			is_array ? obj.Push(val) : obj[key] := val
+			stack.InsertAt(1,val)
+			
+			next := '"' ((is_key := (ch == "{")) ? "}" : "{[]0123456789-tfn")
+		} else if InStr("}]", ch) {
+			stack.RemoveAt(1)
+            next := (stack[1]==tree) ? "" : (stack[1] is Array) ? ",]" : ",}"
+		} else if InStr(",:", ch) {
+			is_key := (!is_array && ch == ",")
+			next := is_key ? '"' : '"{[0123456789-tfn'
+		} else { ; string | number | true | false | null
+			if (ch == '"') { ; string
+				i := pos
+				while i := InStr(src, '"',, i+1) {
+					val := StrReplace(SubStr(src, pos+1, i-pos-1), "\\", "\u005C")
+					if (SubStr(val, -1) != "\")
+						break
+				}
+				if !i ? (pos--, next := "'") : 0
 					continue
-				if !InStr(next, ch, 1)
-					this.ParseError(next, text, pos)
 
-				holder := stack[1]
-				is_array := holder.IsArray
+				pos := i ; update pos
 
-				if InStr(",:", ch) {
-					next := (is_key := !is_array && ch == ",") ? quot : json_value
+				val := StrReplace(val, "\/", "/")
+				val := StrReplace(val, '\"', '"')
+				, val := StrReplace(val, "\b", "`b")
+				, val := StrReplace(val, "\f", "`f")
+				, val := StrReplace(val, "\n", "`n")
+				, val := StrReplace(val, "\r", "`r")
+				, val := StrReplace(val, "\t", "`t")
 
-				} else if InStr("}]", ch) {
-					ObjRemoveAt(stack, 1)
-					next := stack[1]==root ? "" : stack[1].IsArray ? ",]" : ",}"
+				i := 0
+				while i := InStr(val, "\",, i+1) {
+					if (SubStr(val, i+1, 1) != "u") ? (pos -= StrLen(SubStr(val, i)), next := "\") : 0
+						continue 2
 
-				} else {
-					if InStr("{[", ch) {
-					; Check if Array() is overridden and if its return value has
-					; the 'IsArray' property. If so, Array() will be called normally,
-					; otherwise, use a custom base object for arrays
-						static json_array := Func("Array").IsBuiltIn || ![].IsArray ? {IsArray: true} : 0
-					
-					; sacrifice readability for minor(actually negligible) performance gain
-						(ch == "{")
-							? ( is_key := true
-							  , value := {}
-							  , next := object_key_or_object_closing )
-						; ch == "["
-							: ( value := json_array ? new json_array : []
-							  , next := json_value_or_array_closing )
-						
-						ObjInsertAt(stack, 1, value)
-
-						if (this.keys)
-							this.keys[value] := []
-					
-					} else {
-						if (ch == quot) {
-							i := pos
-							while (i := InStr(text, quot,, i+1)) {
-								value := StrReplace(SubStr(text, pos+1, i-pos-1), "\\", "\u005c")
-
-								static tail := A_AhkVersion<"2" ? 0 : -1
-								if (SubStr(value, tail) != "\")
-									break
-							}
-
-							if (!i)
-								this.ParseError("'", text, pos)
-
-							  value := StrReplace(value,  "\/",  "/")
-							, value := StrReplace(value, bashq, quot)
-							, value := StrReplace(value,  "\b", "`b")
-							, value := StrReplace(value,  "\f", "`f")
-							, value := StrReplace(value,  "\n", "`n")
-							, value := StrReplace(value,  "\r", "`r")
-							, value := StrReplace(value,  "\t", "`t")
-
-							pos := i ; update pos
-							
-							i := 0
-							while (i := InStr(value, "\",, i+1)) {
-								if !(SubStr(value, i+1, 1) == "u")
-									this.ParseError("\", text, pos - StrLen(SubStr(value, i+1)))
-
-								uffff := Abs("0x" . SubStr(value, i+2, 4))
-								if (A_IsUnicode || uffff < 0x100)
-									value := SubStr(value, 1, i-1) . Chr(uffff) . SubStr(value, i+6)
-							}
-
-							if (is_key) {
-								key := value, next := ":"
-								continue
-							}
-						
-						} else {
-							value := SubStr(text, pos, i := RegExMatch(text, "[\]\},\s]|$",, pos)-pos)
-
-							static number := "number", integer :="integer"
-							if value is %number%
-							{
-								if value is %integer%
-									value += 0
-							}
-							else if (value == "true" || value == "false")
-								value := %value% + 0
-							else if (value == "null")
-								value := ""
-							else
-							; we can do more here to pinpoint the actual culprit
-							; but that's just too much extra work.
-								this.ParseError(next, text, pos, i)
-
-							pos += i-1
-						}
-
-						next := holder==root ? "" : is_array ? ",]" : ",}"
-					} ; If InStr("{[", ch) { ... } else
-
-					is_array? key := ObjPush(holder, value) : holder[key] := value
-
-					if (this.keys && this.keys.HasKey(holder))
-						this.keys[holder].Push(key)
+					xxxx := Abs("0x" . SubStr(val, i+2, 4)) ; \uXXXX - JSON unicode escape sequence
+					if (xxxx < 0x100)
+						val := SubStr(val, 1, i-1) . Chr(xxxx) . SubStr(val, i+6)
 				}
-			
-			} ; while ( ... )
-
-			return this.rev ? this.Walk(root, "") : root[""]
-		}
-
-		ParseError(expect, ByRef text, pos, len:=1)
-		{
-			static quot := Chr(34), qurly := quot . "}"
-			
-			line := StrSplit(SubStr(text, 1, pos), "`n", "`r").Length()
-			col := pos - InStr(text, "`n",, -(StrLen(text)-pos+1))
-			msg := Format("{1}`n`nLine:`t{2}`nCol:`t{3}`nChar:`t{4}"
-			,     (expect == "")     ? "Extra data"
-			    : (expect == "'")    ? "Unterminated string starting at"
-			    : (expect == "\")    ? "Invalid \escape"
-			    : (expect == ":")    ? "Expecting ':' delimiter"
-			    : (expect == quot)   ? "Expecting object key enclosed in double quotes"
-			    : (expect == qurly)  ? "Expecting object key enclosed in double quotes or object closing '}'"
-			    : (expect == ",}")   ? "Expecting ',' delimiter or object closing '}'"
-			    : (expect == ",]")   ? "Expecting ',' delimiter or array closing ']'"
-			    : InStr(expect, "]") ? "Expecting JSON value or array closing ']'"
-			    :                      "Expecting JSON value(string, number, true, false, null, object or array)"
-			, line, col, pos)
-
-			static offset := A_AhkVersion<"2" ? -3 : -4
-			throw Exception(msg, offset, SubStr(text, pos, len))
-		}
-
-		Walk(holder, key)
-		{
-			value := holder[key]
-			if IsObject(value) {
-				for i, k in this.keys[value] {
-					; check if ObjHasKey(value, k) ??
-					v := this.Walk(value, k)
-					if (v != JSON.Undefined)
-						value[k] := v
-					else
-						ObjDelete(value, k)
+				
+				if is_key {
+					key := val, next := ":"
+					continue
 				}
+			} else { ; number | true | false | null
+				val := SubStr(src, pos, i := RegExMatch(src, "[\]\},\s]|$",, pos)-pos)
+				
+                if IsInteger(val)
+                    val += 0
+                else if IsFloat(val)
+                    val += 0
+                else if (val == "true" || val == "false")
+                    val := (val == "true")
+                else if (val == "null")
+                    val := ""
+                else if is_key {
+                    pos--, next := "#"
+                    continue
+                }
+				
+				pos += i-1
 			}
 			
-			return this.rev.Call(holder, key, value)
+			is_array ? obj.Push(val) : obj[key] := val
+			next := obj == tree ? "" : is_array ? ",]" : ",}"
 		}
 	}
-
-	/**
-	 * Method: Dump
-	 *     Converts an AHK value into a JSON string
-	 * Syntax:
-	 *     str := JSON.Dump( value [, replacer, space ] )
-	 * Parameter(s):
-	 *     str        [retval] - JSON representation of an AHK value
-	 *     value          [in] - any value(object, string, number)
-	 *     replacer  [in, opt] - function object, similar to JavaScript's
-	 *                           JSON.stringify() 'replacer' parameter
-	 *     space     [in, opt] - similar to JavaScript's JSON.stringify()
-	 *                           'space' parameter
-	 */
-	class Dump extends JSON.Functor
-	{
-		Call(self, value, replacer:="", space:="")
-		{
-			this.rep := IsObject(replacer) ? replacer : ""
-
-			this.gap := ""
-			if (space) {
-				static integer := "integer"
-				if space is %integer%
-					Loop, % ((n := Abs(space))>10 ? 10 : n)
-						this.gap .= " "
-				else
-					this.gap := SubStr(space, 1, 10)
-
-				this.indent := "`n"
-			}
-
-			return this.Str({"": value}, "")
-		}
-
-		Str(holder, key)
-		{
-			value := holder[key]
-
-			if (this.rep)
-				value := this.rep.Call(holder, key, ObjHasKey(holder, key) ? value : JSON.Undefined)
-
-			if IsObject(value) {
-			; Check object type, skip serialization for other object types such as
-			; ComObject, Func, BoundFunc, FileObject, RegExMatchObject, Property, etc.
-				static type := A_AhkVersion<"2" ? "" : Func("Type")
-				if (type ? type.Call(value) == "Object" : ObjGetCapacity(value) != "") {
-					if (this.gap) {
-						stepback := this.indent
-						this.indent .= this.gap
-					}
-
-					is_array := value.IsArray
-				; Array() is not overridden, rollback to old method of
-				; identifying array-like objects. Due to the use of a for-loop
-				; sparse arrays such as '[1,,3]' are detected as objects({}). 
-					if (!is_array) {
-						for i in value
-							is_array := i == A_Index
-						until !is_array
-					}
-
-					str := ""
-					if (is_array) {
-						Loop, % value.Length() {
-							if (this.gap)
-								str .= this.indent
-							
-							v := this.Str(value, A_Index)
-							str .= (v != "") ? v . "," : "null,"
-						}
-					} else {
-						colon := this.gap ? ": " : ":"
-						for k in value {
-							v := this.Str(value, k)
-							if (v != "") {
-								if (this.gap)
-									str .= this.indent
-
-								str .= this.Quote(k) . colon . v . ","
-							}
-						}
-					}
-
-					if (str != "") {
-						str := RTrim(str, ",")
-						if (this.gap)
-							str .= stepback
-					}
-
-					if (this.gap)
-						this.indent := stepback
-
-					return is_array ? "[" . str . "]" : "{" . str . "}"
-				}
-			
-			} else ; is_number ? value : "value"
-				return ObjGetCapacity([value], 1)=="" ? value : this.Quote(value)
-		}
-
-		Quote(string)
-		{
-			static quot := Chr(34), bashq := "\" . quot
-
-			if (string != "") {
-				  string := StrReplace(string,  "\",  "\\")
-				; , string := StrReplace(string,  "/",  "\/") ; optional in ECMAScript
-				, string := StrReplace(string, quot, bashq)
-				, string := StrReplace(string, "`b",  "\b")
-				, string := StrReplace(string, "`f",  "\f")
-				, string := StrReplace(string, "`n",  "\n")
-				, string := StrReplace(string, "`r",  "\r")
-				, string := StrReplace(string, "`t",  "\t")
-
-				static rx_escapable := A_AhkVersion<"2" ? "O)[^\x20-\x7e]" : "[^\x20-\x7e]"
-				while RegExMatch(string, rx_escapable, m)
-					string := StrReplace(string, m.Value, Format("\u{1:04x}", Ord(m.Value)))
-			}
-
-			return quot . string . quot
-		}
-	}
-
-	/**
-	 * Property: Undefined
-	 *     Proxy for 'undefined' type
-	 * Syntax:
-	 *     undefined := JSON.Undefined
-	 * Remarks:
-	 *     For use with reviver and replacer functions since AutoHotkey does not
-	 *     have an 'undefined' type. Returning blank("") or 0 won't work since these
-	 *     can't be distnguished from actual JSON values. This leaves us with objects.
-	 *     Replacer() - the caller may return a non-serializable AHK objects such as
-	 *     ComObject, Func, BoundFunc, FileObject, RegExMatchObject, and Property to
-	 *     mimic the behavior of returning 'undefined' in JavaScript but for the sake
-	 *     of code readability and convenience, it's better to do 'return JSON.Undefined'.
-	 *     Internally, the property returns a ComObject with the variant type of VT_EMPTY.
-	 */
-	Undefined[]
-	{
-		get {
-			static empty := {}, vt_empty := ComObject(0, &empty, 1)
-			return vt_empty
-		}
-	}
-
-	class Functor
-	{
-		__Call(method, ByRef arg, args*)
-		{
-		; When casting to Call(), use a new instance of the "function object"
-		; so as to avoid directly storing the properties(used across sub-methods)
-		; into the "function object" itself.
-			if IsObject(method)
-				return (new this).Call(method, arg, args*)
-			else if (method == "")
-				return (new this).Call(arg, args*)
-		}
-	}
+	
+	return tree[1]
 }
+
+json_dump(obj, indent:="", lvl:=1) {
+	if IsObject(obj) {
+        If !(obj is Array || obj is Map || obj is String || obj is Number)
+			throw Error("Object type not supported.", -1, Format("<Object at 0x{:p}>", ObjPtr(obj)))
+		
+		if IsInteger(indent)
+		{
+			if (indent < 0)
+				throw Error("Indent parameter must be a postive integer.", -1, indent)
+			spaces := indent, indent := ""
+			
+			Loop spaces ; ===> changed
+				indent .= " "
+		}
+		indt := ""
+		
+		Loop indent ? lvl : 0
+			indt .= indent
+        
+        is_array := (obj is Array)
+        
+		lvl += 1, out := "" ; Make #Warn happy
+		for k, v in obj {
+			if IsObject(k) || (k == "")
+				throw Error("Invalid object key.", -1, k ? Format("<Object at 0x{:p}>", ObjPtr(obj)) : "<blank>")
+			
+			if !is_array ;// key ; ObjGetCapacity([k], 1)
+				out .= (ObjGetCapacity([k]) ? json_dump(k) : escape_str(k)) (indent ? ": " : ":") ; token + padding
+			
+			out .= json_dump(v, indent, lvl) ; value
+				.  ( indent ? ",`n" . indt : "," ) ; token + indent
+		}
+
+		if (out != "") {
+			out := Trim(out, ",`n" . indent)
+			if (indent != "")
+				out := "`n" . indt . out . "`n" . SubStr(indt, StrLen(indent)+1)
+		}
+		
+		return is_array ? "[" . out . "]" : "{" . out . "}"
+	
+    } Else If (obj is Number)
+        return obj
+    
+    Else ; String
+        return escape_str(obj)
+	
+    escape_str(obj) {
+        obj := StrReplace(obj,"\","\\")
+        obj := StrReplace(obj,"`t","\t")
+        obj := StrReplace(obj,"`r","\r")
+        obj := StrReplace(obj,"`n","\n")
+        obj := StrReplace(obj,"`b","\b")
+        obj := StrReplace(obj,"`f","\f")
+        obj := StrReplace(obj,"/","\/")
+        obj := StrReplace(obj,'"','\"')
+        
+        return '"' obj '"'
+    }
+}
+
