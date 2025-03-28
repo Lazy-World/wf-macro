@@ -1,10 +1,25 @@
 {
-    "$version": 1,
-    "hotkeys": {
-      "testDelay": "F1"
-    },
-    "keys": {
+  "$version": 1,
+  "hk": {
+      "testDelay": {
+          "key": "F1",
+          "description": "Test delay",
+          "tooltip": "Measures delay of pressed"
+      }
+  },
+  "val": {
+      "sleep1": {
+          "val": 1000,
+          "description": "Sleep 1",
+          "tooltip": "Sleep 1 second"
+      },
+      "enableTest": {
+          "val": true,
+          "description": "Sleep 1",
+          "tooltip": "Sleep 1 second"
+      }
+  },
+  "keys": {
       "tab": "Tab"
-    }
   }
-  
+}
