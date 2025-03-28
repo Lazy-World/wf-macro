@@ -17,6 +17,26 @@
             "val": true,
             "description": "Sleep 1",
             "tooltip": "Sleep 1 second"
+        },
+        "sleep12": {
+            "val": 1000,
+            "description": "Sleep 1",
+            "tooltip": "Sleep 1 second"
+        },
+        "enableTest1": {
+            "val": true,
+            "description": "Sleep 1",
+            "tooltip": "Sleep 1 second"
+        },
+        "enableTest12": {
+            "val": true,
+            "description": "Sleep 1",
+            "tooltip": "Sleep 1 second"
+        },
+        "enableTest13": {
+            "val": true,
+            "description": "Sleep 1",
+            "tooltip": "Sleep 1 second"
         }
     },
     "keys": {
