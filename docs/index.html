@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Cercony · ahk-manager — макросы для Warframe</title>
+  <link rel="icon" href="../assets/cat-favicon-dark.ico"/>
+  <link rel="stylesheet" href="styles.css"/>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel" src="icons.jsx"></script>
+  <script type="text/babel" src="data.jsx"></script>
+  <script type="text/babel" src="hero.jsx"></script>
+  <script type="text/babel" src="sections.jsx"></script>
+  <script type="text/babel" src="demo.jsx"></script>
+  <script type="text/babel" src="../tweaks-panel.jsx"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+      "lang": "ru",
+      "theme": "dark",
+      "accent": "neutral",
+      "heroVariant": "mascot"
+    }/*EDITMODE-END*/;
+
+    const ACCENT_MAP = {
+      neutral: null,
+      red:    "oklch(0.577 0.245 27.3)",
+      green:  "oklch(0.6 0.18 145)",
+      blue:   "oklch(0.55 0.18 250)",
+      violet: "oklch(0.55 0.22 295)",
+      amber:  "oklch(0.72 0.16 65)"
+    };
+
+    const App = () => {
+      const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+      const { lang, theme, accent, heroVariant } = tweaks;
+      const t = window.STRINGS[lang] || window.STRINGS.ru;
+
+      // theme
+      useEffect(() => {
+        document.documentElement.classList.toggle("dark", theme === "dark");
+        document.documentElement.lang = lang;
+      }, [theme, lang]);
+
+      // accent
+      useEffect(() => {
+        const v = ACCENT_MAP[accent];
+        if (v) document.documentElement.style.setProperty("--accent-color", v);
+        else document.documentElement.style.removeProperty("--accent-color");
+      }, [accent]);
+
+      // reveal-on-scroll
+      useEffect(() => {
+        const obs = new IntersectionObserver((entries) => {
+          entries.forEach(e => { if (e.isIntersecting) e.target.classList.add("in"); });
+        }, { threshold: 0.12 });
+        document.querySelectorAll(".reveal").forEach(el => obs.observe(el));
+        return () => obs.disconnect();
+      }, [lang, heroVariant]);
+
+      return (
+        <>
+          {/* Top bar */}
+          <header className="nav">
+            <div className="nav-brand">
+              <img src="../assets/cat.svg" alt="" />
+              <span>ahk-manager</span>
+              <span className="nav-version">v0.4.2</span>
+            </div>
+            <div className="nav-spacer"></div>
+            <nav className="nav-links">
+              <a className="nav-link" href="#what">{t.nav.what}</a>
+              <a className="nav-link" href="#features">{t.nav.features}</a>
+              <a className="nav-link" href="#demo">{t.nav.demo}</a>
+              <a className="nav-link" href="#install">{t.nav.install}</a>
+              <a className="nav-link" href="#faq">{t.nav.faq}</a>
+              <a className="nav-link" href="#contribute">{t.nav.contribute}</a>
+            </nav>
+            <div className="nav-actions">
+              <button
+                className="btn btn-ghost btn-icon-sm"
+                onClick={() => setTweak("theme", theme === "dark" ? "light" : "dark")}
+                aria-label="Toggle theme"
+                title={theme === "dark" ? "Light" : "Dark"}
+              >
+                {theme === "dark" ? <Ico.Sun size={16} /> : <Ico.Moon size={16} />}
+              </button>
+              <button
+                className="btn btn-outline btn-sm"
+                onClick={() => setTweak("lang", lang === "ru" ? "en" : "ru")}
+                style={{ fontFamily: "var(--font-mono)", textTransform: "uppercase", letterSpacing: "0.05em" }}
+              >
+                {lang}
+              </button>
+              <a className="btn btn-primary btn-sm" href="https://github.com/Lazy-World/wf-macro-loader">
+                <Ico.Github size={14} /> GitHub
+              </a>
+            </div>
+          </header>
+
+          <Hero t={t} variant={heroVariant} lang={lang} />
+          <div className="divider"></div>
+          <What t={t} />
+          <div className="divider"></div>
+          <Features t={t} />
+          <div className="divider"></div>
+          <Demo t={t} lang={lang} />
+          <div className="divider"></div>
+          <Install t={t} />
+          <div className="divider"></div>
+          <FAQ t={t} />
+          <div className="divider"></div>
+          <Contribute t={t} />
+          <Footer t={t} />
+
+          <TweaksPanel title="Tweaks">
+            <TweakSection title={lang === "ru" ? "Тема и язык" : "Theme & language"}>
+              <TweakRadio
+                label={lang === "ru" ? "Тема" : "Theme"}
+                value={theme}
+                onChange={(v) => setTweak("theme", v)}
+                options={[{ value: "light", label: "Light" }, { value: "dark", label: "Dark" }]}
+              />
+              <TweakRadio
+                label={lang === "ru" ? "Язык" : "Language"}
+                value={lang}
+                onChange={(v) => setTweak("lang", v)}
+                options={[{ value: "ru", label: "RU" }, { value: "en", label: "EN" }]}
+              />
+            </TweakSection>
+            <TweakSection title={lang === "ru" ? "Акцентный цвет" : "Accent color"}>
+              <TweakSelect
+                label={lang === "ru" ? "Акцент" : "Accent"}
+                value={accent}
+                onChange={(v) => setTweak("accent", v)}
+                options={[
+                  { value: "neutral", label: lang === "ru" ? "Нейтральный (по умолчанию)" : "Neutral (default)" },
+                  { value: "red", label: "Red" },
+                  { value: "green", label: "Green" },
+                  { value: "blue", label: "Blue" },
+                  { value: "violet", label: "Violet" },
+                  { value: "amber", label: "Amber" }
+                ]}
+              />
+            </TweakSection>
+            <TweakSection title={lang === "ru" ? "Вариант Hero" : "Hero variant"}>
+              <TweakRadio
+                label={lang === "ru" ? "Композиция" : "Composition"}
+                value={heroVariant}
+                onChange={(v) => setTweak("heroVariant", v)}
+                options={[
+                  { value: "mascot",   label: lang === "ru" ? "Маскот"   : "Mascot" },
+                  { value: "terminal", label: lang === "ru" ? "Терминал" : "Terminal" },
+                  { value: "minimal",  label: lang === "ru" ? "Минимум"  : "Minimal" }
+                ]}
+              />
+            </TweakSection>
+          </TweaksPanel>
+        </>
+      );
+    };
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
