@@ -148,7 +148,7 @@ const Footer = ({ t }) => (
     <div className="footer-inner">
       <div>
         <div className="footer-brand">
-          <img src="../assets/cat.svg" alt="" />
+          <img src="assets/cat.svg" alt="" />
           <span>Cercony · ahk-manager</span>
         </div>
         <div className="footer-tagline">{t.footer.tagline}</div>

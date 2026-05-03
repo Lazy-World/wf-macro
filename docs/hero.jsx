@@ -60,7 +60,7 @@ const HeroArtMascot = () => (
     <div className="hero-art-corner tr">1067 × 1068</div>
     <div className="hero-art-corner bl">v0.4.2</div>
     <div className="hero-art-corner br">cat is cat</div>
-    <img src="../assets/cat.svg" alt="" className="hero-art-cat" />
+    <img src="assets/cat.svg" alt="" className="hero-art-cat" />
   </div>
 );
 
@@ -110,7 +110,7 @@ const HeroArtTerminal = ({ lang }) => {
 
 const HeroArtMinimal = () => (
   <div className="hero-minimal">
-    <img src="../assets/cat.svg" alt="" className="hero-minimal-cat" />
+    <img src="assets/cat.svg" alt="" className="hero-minimal-cat" />
     <div className="hero-minimal-stamp">
       <div className="row"><span>cercony</span><span>·</span><span>2026</span></div>
       <div className="row"><span>v0.4.2</span><span>·</span><span>mit</span></div>

@@ -89,7 +89,7 @@ const Demo = ({ t, lang }) => {
           {/* Sidebar */}
           <div className="demo-sidebar">
             <div className="demo-sb-logo">
-              <img src="../assets/cat.svg" alt="" />
+              <img src="assets/cat.svg" alt="" />
               <div className="demo-sb-logo-text">
                 <div className="demo-sb-logo-name">ahk-manager</div>
                 <div className="demo-sb-logo-ver">v0.4.2</div>
@@ -133,7 +133,7 @@ const Demo = ({ t, lang }) => {
                   )}
                   {filtered.length === 0 && (
                     <div className="demo-empty">
-                      <img src="../assets/cat.svg" alt="" />
+                      <img src="assets/cat.svg" alt="" />
                       <div>{lang === "ru" ? "Ничего не найдено" : "Nothing found"}</div>
                     </div>
                   )}
