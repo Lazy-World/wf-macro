@@ -33,8 +33,8 @@ gGuiH := 28
 gPosX := Ceil(A_ScreenWidth * 0.008)
 gPosY := Ceil(A_ScreenHeight * 0.47)
 
-g_ui.Push(Window("gui_chat", gPosX, gPosY, gGuiW, gGuiH, ui_theme, 3.132))
-g_ui[1].new_text("Cooldown", "MELEE", "auto", "title", "dadada")
+g_ui.Push(Window("gui_chat", gPosX, gPosY, gGuiW, gGuiH, ui_theme, {blur: 1, border: 1, ol: [1, 1, 1, 1]}))
+g_ui[1].new_text("Cooldown", "MELEE", "auto", "title")
 g_ui[1].show()
 return
 

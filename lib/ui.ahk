@@ -716,15 +716,15 @@ class Window {
         return this.text_window
     }
 
-    size() {
+    get_size() {
         return this.window.size
     }
 
-    controls() {
+    get_controls() {
         return this.text_window.get_controls()
     }
 
-    hwnd() {
+    get_hwnd() {
         return this.window.get_hwnd()
     }
 
