@@ -119,7 +119,7 @@ const Demo = ({ t, lang }) => {
                   <kbd>/</kbd>
                 </div>
               )}
-              <span className="tag green" style={{ marginLeft: 8 }}>{t.demo.version}</span>
+              <span className="tag green" style={{ marginLeft: 16 }}>{t.demo.version}</span>
             </div>
             <div className="demo-content">
               {(route === "downloaded" || route === "get") && (

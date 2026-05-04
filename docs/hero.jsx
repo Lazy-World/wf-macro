@@ -1,22 +1,36 @@
 /* Hero — three variants selectable via Tweaks */
 const { useState, useEffect, useRef } = React;
 
-function useTypewriter(text, speed = 35, startDelay = 200) {
+function useTypeLoop(text, { typeMs = 70, eraseMs = 40, holdMs = 1400, gapMs = 500 } = {}) {
   const [out, setOut] = useState("");
-  const [done, setDone] = useState(false);
   useEffect(() => {
-    setOut(""); setDone(false);
-    let i = 0;
-    const start = setTimeout(() => {
-      const id = setInterval(() => {
-        i++;
-        setOut(text.slice(0, i));
-        if (i >= text.length) { clearInterval(id); setDone(true); }
-      }, speed);
-    }, startDelay);
-    return () => clearTimeout(start);
-  }, [text, speed, startDelay]);
-  return [out, done];
+    let cancelled = false;
+    let timer;
+    const run = async () => {
+      while (!cancelled) {
+        // type
+        for (let i = 1; i <= text.length; i++) {
+          if (cancelled) return;
+          setOut(text.slice(0, i));
+          await new Promise(r => { timer = setTimeout(r, typeMs); });
+        }
+        // hold
+        await new Promise(r => { timer = setTimeout(r, holdMs); });
+        if (cancelled) return;
+        // erase
+        for (let i = text.length - 1; i >= 0; i--) {
+          if (cancelled) return;
+          setOut(text.slice(0, i));
+          await new Promise(r => { timer = setTimeout(r, eraseMs); });
+        }
+        // gap
+        await new Promise(r => { timer = setTimeout(r, gapMs); });
+      }
+    };
+    run();
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [text, typeMs, eraseMs, holdMs, gapMs]);
+  return out;
 }
 
 const HeroBadge = ({ text }) => (
@@ -27,27 +41,28 @@ const HeroBadge = ({ text }) => (
 );
 
 const HeroCopy = ({ t }) => {
-  const [typed, done] = useTypewriter(t.titleB, 70, 400);
+  const h = t.hero;
+  const typed = useTypeLoop("AHK Manager", { typeMs: 70, eraseMs: 40, holdMs: 1400, gapMs: 500 });
   return (
     <div>
-      <HeroBadge text={t.badge} />
+      <HeroBadge text={h.badge} />
       <h1 className="hero-title">
-        {t.titleA} <span className="accent">{typed}</span>{!done && <span className="hero-cursor"></span>}{done && t.titleC}
+        <span className="accent">{typed}</span><span className="hero-cursor"></span>
       </h1>
-      <p className="hero-lead">{t.lead}</p>
+      <p className="hero-lead">{h.lead}</p>
       <div className="hero-cta">
         <a href="https://github.com/Lazy-World/wf-macro-loader/releases" className="btn btn-primary btn-lg">
-          <Ico.ArrowDownToLine size={16} /> {t.ctaPrimary}
+          <Ico.ArrowDownToLine size={16} /> {h.ctaPrimary}
         </a>
         <a href="https://github.com/Lazy-World/wf-macro-loader" className="btn btn-outline btn-lg">
-          <Ico.Github size={16} /> {t.ctaSecondary}
+          <Ico.Github size={16} /> {h.ctaSecondary}
         </a>
       </div>
       <div className="hero-meta">
-        <div className="hero-meta-item"><div className="label">{t.meta1Label}</div><div className="value">{t.meta1Value}</div></div>
-        <div className="hero-meta-item"><div className="label">{t.meta2Label}</div><div className="value">{t.meta2Value}</div></div>
-        <div className="hero-meta-item"><div className="label">{t.meta3Label}</div><div className="value">{t.meta3Value}</div></div>
-        <div className="hero-meta-item"><div className="label">{t.meta4Label}</div><div className="value">{t.meta4Value}</div></div>
+        <div className="hero-meta-item"><div className="label">{h.meta1Label}</div><div className="value">{h.meta1Value}</div></div>
+        <div className="hero-meta-item"><div className="label">{h.meta2Label}</div><div className="value">{h.meta2Value}</div></div>
+        <div className="hero-meta-item"><div className="label">{h.meta3Label}</div><div className="value">{h.meta3Value}</div></div>
+        <div className="hero-meta-item"><div className="label">{h.meta4Label}</div><div className="value">{h.meta4Value}</div></div>
       </div>
     </div>
   );

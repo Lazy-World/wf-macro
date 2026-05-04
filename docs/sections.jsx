@@ -104,28 +104,71 @@ const FAQ = ({ t }) => {
 };
 
 /* ===== Contribute ===== */
-const Contribute = ({ t }) => (
+const ScriptExample = () => (
+  <>
+    <div><span className="com">#Requires</span> <span className="kw">AutoHotkey</span> <span className="str">"v2.0"</span></div>
+    <div>&nbsp;</div>
+    <div><span className="com">; load config beside the script</span></div>
+    <div>cfg := <span className="kw">FileRead</span>(<span className="str">A_ScriptDir "\cfg\my_macro.json"</span>)</div>
+    <div>g := json_load(&cfg)</div>
+    <div>&nbsp;</div>
+    <div><span className="com">; bind hotkeys from cfg.hk</span></div>
+    <div><span className="kw">for</span> fn, hk <span className="kw">in</span> g[<span className="str">"hk"</span>] {"{"}</div>
+    <div>&nbsp;&nbsp;<span className="kw">Hotkey</span>(<span className="str">"*"</span> . hk[<span className="str">"key"</span>], %fn%)</div>
+    <div>{"}"}</div>
+    <div><span className="kw">return</span></div>
+    <div>&nbsp;</div>
+    <div>testDelay(*) {"{"}</div>
+    <div>&nbsp;&nbsp;<span className="kw">if</span> !g[<span className="str">"val"</span>][<span className="str">"enableTest"</span>][<span className="str">"val"</span>]</div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span className="kw">return</span></div>
+    <div>&nbsp;&nbsp;<span className="kw">SendInput</span> <span className="str">{`"{" g["keys"]["tab"] "}"`}</span></div>
+    <div>&nbsp;&nbsp;<span className="kw">Sleep</span> g[<span className="str">"val"</span>][<span className="str">"sleep1"</span>][<span className="str">"val"</span>]</div>
+    <div>{"}"}</div>
+    <div>&nbsp;</div>
+    <div>*<span className="kw">Insert</span>::<span className="kw">Reload</span></div>
+    <div>*<span className="kw">Del</span>::<span className="kw">ExitApp</span></div>
+  </>
+);
+
+const ConfigExample = () => (
+  <>
+    <div>{"{"}</div>
+    <div>&nbsp;&nbsp;<span className="str">"$version"</span>: <span className="kw">1</span>,</div>
+    <div>&nbsp;&nbsp;<span className="str">"hk"</span>: {"{"}</div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span className="str">"testDelay"</span>: {"{"}</div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className="str">"key"</span>: <span className="str">"F1"</span>,</div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className="str">"description"</span>: <span className="str">"Test delay"</span>,</div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className="str">"tooltip"</span>: <span className="str">"Measures delay"</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;{"}"}</div>
+    <div>&nbsp;&nbsp;{"}"},</div>
+    <div>&nbsp;&nbsp;<span className="str">"val"</span>: {"{"}</div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span className="str">"sleep1"</span>: {"{"} <span className="str">"val"</span>: <span className="kw">1000</span>, <span className="str">"description"</span>: <span className="str">"Sleep 1"</span> {"}"},</div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span className="str">"enableTest"</span>: {"{"} <span className="str">"val"</span>: <span className="kw">true</span>, <span className="str">"description"</span>: <span className="str">"Enable"</span> {"}"}</div>
+    <div>&nbsp;&nbsp;{"}"},</div>
+    <div>&nbsp;&nbsp;<span className="str">"keys"</span>: {"{"} <span className="str">"tab"</span>: <span className="str">"Tab"</span> {"}"}</div>
+    <div>{"}"}</div>
+  </>
+);
+
+const Contribute = ({ t }) => {
+  const [tab, setTab] = useState2("script");
+  return (
   <section className="section" id="contribute">
     <SectionHeader eyebrow={t.contribute.eyebrow} title={t.contribute.title} lead={t.contribute.lead} />
     <div className="reveal contribute-grid" style={{ marginTop: 32 }}>
       <div className="code-block">
         <div className="code-block-head">
-          <Ico.Code size={12} /> scripts/my_macro.ahk
+          <div className="code-tabs">
+            <button className={`code-tab ${tab === "script" ? "active" : ""}`} onClick={() => setTab("script")}>
+              <Ico.Code size={12} /> my_macro.ahk
+            </button>
+            <button className={`code-tab ${tab === "config" ? "active" : ""}`} onClick={() => setTab("config")}>
+              <Ico.Settings size={12} /> cfg/my_macro.json
+            </button>
+          </div>
         </div>
         <div className="code-block-body">
-          <div><span className="com">; --- описание ---</span></div>
-          <div><span className="com">; пример: hold E for melee combo</span></div>
-          <div><span className="com">; bind: E (hold)</span></div>
-          <div>&nbsp;</div>
-          <div><span className="kw">#Requires</span> AutoHotkey <span className="str">"v2.0"</span></div>
-          <div><span className="kw">#SingleInstance</span> Force</div>
-          <div>&nbsp;</div>
-          <div>$<span className="kw">e</span>::{"{"}</div>
-          <div>&nbsp;&nbsp;&nbsp; <span className="kw">while</span> GetKeyState(<span className="str">"e"</span>, <span className="str">"P"</span>) {"{"}</div>
-          <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Send <span className="str">"e"</span></div>
-          <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Sleep <span className="str">35</span></div>
-          <div>&nbsp;&nbsp;&nbsp; {"}"}</div>
-          <div>{"}"}</div>
+          {tab === "script" ? <ScriptExample /> : <ConfigExample />}
         </div>
       </div>
       <div>
@@ -140,7 +183,8 @@ const Contribute = ({ t }) => (
       </div>
     </div>
   </section>
-);
+  );
+};
 
 /* ===== Footer ===== */
 const Footer = ({ t }) => (

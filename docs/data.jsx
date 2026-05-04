@@ -8,8 +8,8 @@ const STRINGS = {
       titleA: "макросы для",
       titleB: "Warframe",
       titleC: ", без боли",
-      lead: "Маленькая утилита для скачивания, запуска и ребайнда AHK-скриптов. Без рекламы, без аккаунтов, без подписки. Просто открыл — нажал клавишу — играешь.",
-      ctaPrimary: "Скачать для Windows",
+      lead: "Маленькая утилита для управления AHK-макросами.",
+      ctaPrimary: "Загрузить для Windows",
       ctaSecondary: "Открыть на GitHub",
       meta1Label: "размер", meta1Value: "~38 МБ",
       meta2Label: "лицензия", meta2Value: "MIT",
@@ -28,7 +28,7 @@ const STRINGS = {
         { title: "Качает скрипты", desc: "Каталог макросов из официального репо wf-macro. Обновления в один клик, проверка версии в углу.", meta: "git · pull only" },
         { title: "Запускает в фоне", desc: "Скрипты работают через встроенный AutoHotkey. Без установки в систему, без прав администратора.", meta: "ahk v2" },
         { title: "Ребайндит клавиши", desc: "Кликнул в поле, нажал клавишу — бинд заменился. Сохраняется локально в JSON, читаемый человеком.", meta: "press to bind" },
-        { title: "Подключает библиотеки", desc: "Личные коллекции скриптов из своих git-репозиториев. Добавил URL — получил свою категорию.", meta: "any git remote" },
+        { title: "Каталог библиотек", desc: "Библиотеки макросов берутся из репозитория wf-macro — официального каталога скриптов.", meta: "wf-macro" },
         { title: "Двуязычный", desc: "RU и EN из коробки. Переключатель в правом верхнем углу, без перезапуска.", meta: "ru · en" },
         { title: "Кот", desc: "Сидит в логотипе. В тёмной теме — белый. Никакой функциональности, кроме моральной поддержки.", meta: "cat is cat" }
       ]
@@ -61,7 +61,7 @@ const STRINGS = {
       eyebrow: "FAQ",
       title: "Частые вопросы",
       items: [
-        { q: "Это бан в Warframe?", a: "Нет. Все скрипты — простые маппинги клавиш и таймеры через AutoHotkey, как переназначение в любой Logitech G HUB. Не лезет в память клиента, не читает экран. Тем не менее — играете на свой страх и риск, ToS никто не отменял." },
+        { q: "Это бан в Warframe?", a: "Нет. Все скрипты — простые маппинги клавиш и таймеры через AutoHotkey, как переназначение в любой Logitech G HUB. Не лезет в память клиента. Тем не менее — играете на свой страх и риск, ToS никто не отменял." },
         { q: "Откуда берутся скрипты?", a: "Из репо Lazy-World/wf-macro. Каталог открытый, любой может посмотреть исходники .ahk. Свои скрипты подключаются как git-библиотеки во вкладке Libraries." },
         { q: "Где хранятся настройки и бинды?", a: "Локально, в папке пользователя в обычном JSON. Можно открыть редактором, пересобрать, синхронизировать через свой Dropbox — приложение это не сломает." },
         { q: "Зачем кот?", a: "Кот — это кот." },
@@ -70,13 +70,12 @@ const STRINGS = {
     },
     contribute: {
       eyebrow: "контрибуция",
-      title: "Добавить свой скрипт — 4 шага",
+      title: "Добавить свой скрипт — 3 шага",
       lead: "Скрипты живут в отдельном репо wf-macro. Они на чистом AHK v2, без мета-формата.",
       steps: [
-        "Форкните Lazy-World/wf-macro",
+        "Откройте папку со скриптами",
         "Положите .ahk в scripts/, конфиг по умолчанию — в scripts/cfg/",
-        "Опишите назначение и клавиши в комментарии в шапке файла",
-        "Откройте PR — после ревью скрипт появится в Get scripts у всех"
+        "Опишите назначение и клавиши в комментарии в шапке файла — пример есть в моём репозитории"
       ],
       ctaRepo: "Открыть wf-macro"
     },
@@ -92,7 +91,7 @@ const STRINGS = {
       titleA: "macros for",
       titleB: "Warframe",
       titleC: ", painless",
-      lead: "A small utility to download, run, and rebind AHK scripts. No ads, no accounts, no subscription. Just open — press a key — play.",
+      lead: "A small utility for managing AHK macros.",
       ctaPrimary: "Download for Windows",
       ctaSecondary: "Open on GitHub",
       meta1Label: "size", meta1Value: "~38 MB",
@@ -112,7 +111,7 @@ const STRINGS = {
         { title: "Pulls scripts", desc: "Catalog from the official wf-macro repo. One-click updates, version chip in the corner.", meta: "git · pull only" },
         { title: "Runs in background", desc: "Scripts execute via embedded AutoHotkey. No system install, no admin rights.", meta: "ahk v2" },
         { title: "Rebinds keys", desc: "Click a field, press a key — bind replaced. Stored locally as human-readable JSON.", meta: "press to bind" },
-        { title: "Custom libraries", desc: "Plug your personal script collections via your own git remotes. Add URL — get your category.", meta: "any git remote" },
+        { title: "Library catalog", desc: "Macro libraries are pulled from the wf-macro repository — the official catalog of scripts.", meta: "wf-macro" },
         { title: "Bilingual", desc: "RU and EN out of the box. Toggle in the top right, no restart needed.", meta: "ru · en" },
         { title: "Cat", desc: "Sits in the logo. White on dark mode. No functionality besides moral support.", meta: "cat is cat" }
       ]
@@ -145,7 +144,7 @@ const STRINGS = {
       eyebrow: "FAQ",
       title: "Frequently asked",
       items: [
-        { q: "Is this a ban in Warframe?", a: "No. The scripts are plain key remaps and timers over AutoHotkey, same as rebinding in Logitech G HUB. Doesn't touch client memory, doesn't read the screen. That said — you play at your own risk, ToS still applies." },
+        { q: "Is this a ban in Warframe?", a: "No. The scripts are plain key remaps and timers over AutoHotkey, same as rebinding in Logitech G HUB. Doesn't touch client memory. That said — you play at your own risk, ToS still applies." },
         { q: "Where do scripts come from?", a: "From the Lazy-World/wf-macro repo. Catalog is public, any .ahk source can be inspected. Your own scripts plug in as git libraries on the Libraries tab." },
         { q: "Where are settings and binds stored?", a: "Locally in the user folder as plain JSON. Open it in any editor, edit, sync via your own Dropbox — the app won't choke on it." },
         { q: "Why a cat?", a: "Cat is cat." },
@@ -154,13 +153,12 @@ const STRINGS = {
     },
     contribute: {
       eyebrow: "contribute",
-      title: "Add your script in 4 steps",
+      title: "Add your script in 3 steps",
       lead: "Scripts live in a separate repo, wf-macro. Pure AHK v2, no meta-format.",
       steps: [
-        "Fork Lazy-World/wf-macro",
+        "Open the scripts folder",
         "Drop .ahk into scripts/, default config into scripts/cfg/",
-        "Describe purpose and keys in a header comment of the file",
-        "Open a PR — after review, the script shows up in Get scripts for everyone"
+        "Describe purpose and keys in a header comment of the file — there's an example in my repo"
       ],
       ctaRepo: "Open wf-macro"
     },
