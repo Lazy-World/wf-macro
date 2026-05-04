@@ -1,0 +1,17 @@
+{
+    "$version": 1,
+    "hk": {
+        "StartStop": {
+            "key": "XButton2",
+            "description": "PT shoot + zaw throw loop",
+            "tooltip": "Hold to repeat shoot+throw cycle"
+        }
+    },
+    "val": {
+        "shootHold": {
+            "val": 550,
+            "description": "Shoot hold duration (ms)",
+            "tooltip": "Time to hold shoot key down"
+        }
+    }
+}

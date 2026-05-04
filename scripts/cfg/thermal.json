@@ -1,0 +1,32 @@
+{
+    "$version": 1,
+    "hk": {
+        "StartStop": {
+            "key": "XButton2",
+            "description": "Thermal skill spam",
+            "tooltip": "Tap then hold ability while held"
+        }
+    },
+    "val": {
+        "skillKey": {
+            "val": "3",
+            "description": "Ability slot key",
+            "tooltip": "Number key of ability"
+        },
+        "tapDelay": {
+            "val": 500,
+            "description": "Delay after tap (ms)",
+            "tooltip": "Delay between tap and hold"
+        },
+        "holdMs": {
+            "val": 500,
+            "description": "Hold duration (ms)",
+            "tooltip": "Length of held press"
+        },
+        "loopDelay": {
+            "val": 500,
+            "description": "Loop delay (ms)",
+            "tooltip": "Delay before next iteration"
+        }
+    }
+}

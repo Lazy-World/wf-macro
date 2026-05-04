@@ -1,0 +1,27 @@
+{
+    "$version": 1,
+    "hk": {
+        "StartStop": {
+            "key": "XButton2",
+            "description": "Hildryn ability + alt-fire spam",
+            "tooltip": "Loops 2nd ability and alt-fire on timers"
+        }
+    },
+    "val": {
+        "ability2Cd": {
+            "val": 3500,
+            "description": "Ability 2 cooldown (ms)",
+            "tooltip": "Interval between ability casts"
+        },
+        "altFireCd": {
+            "val": 1000,
+            "description": "Alt-fire cooldown (ms)",
+            "tooltip": "Interval between alt-fire shots"
+        },
+        "pollMs": {
+            "val": 50,
+            "description": "Poll interval (ms)",
+            "tooltip": "Hotkey hold polling"
+        }
+    }
+}

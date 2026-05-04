@@ -1,0 +1,22 @@
+{
+    "$version": 1,
+    "hk": {
+        "StartStop": {
+            "key": "XButton2",
+            "description": "Zaw throw",
+            "tooltip": "Performs single zaw throw sequence"
+        }
+    },
+    "val": {
+        "interval": {
+            "val": 25,
+            "description": "Step interval (ms)",
+            "tooltip": "Delay between sequence steps"
+        },
+        "endDelay": {
+            "val": 500,
+            "description": "End delay (ms)",
+            "tooltip": "Final delay after release"
+        }
+    }
+}

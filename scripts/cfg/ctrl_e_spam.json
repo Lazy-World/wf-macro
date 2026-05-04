@@ -1,0 +1,17 @@
+{
+    "$version": 1,
+    "hk": {
+        "StartStop": {
+            "key": "XButton2",
+            "description": "Toggle melee+crouch spam",
+            "tooltip": "Hold key: keeps melee held while spamming crouch"
+        }
+    },
+    "val": {
+        "interval": {
+            "val": 230,
+            "description": "Crouch interval (ms)",
+            "tooltip": "Sleep between crouch down and up"
+        }
+    }
+}
