@@ -1,4 +1,4 @@
-#Requires AutoHotkey v2.0
+﻿#Requires AutoHotkey v2.0
 
 ; Debug include
 #include %A_ScriptDir%/..
@@ -26,23 +26,23 @@ for hotkeyFunction, hotkeyCombination in g_macro["hk"] {
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                 GUI                 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-global ui := []
+global g_ui := []
 
 gGuiW := 80
 gGuiH := 28
 gPosX := Ceil(A_ScreenWidth * 0.008)
 gPosY := Ceil(A_ScreenHeight * 0.47)
 
-ui.Push(Window("gui_chat", gPosX, gPosY, gGuiW, gGuiH, ui_theme, 3.132))
-ui[1].new_text("Cooldown", "HILDR", "auto", "title", "dadada")
-ui[1].show()
+g_ui.Push(Window("gui_chat", gPosX, gPosY, gGuiW, gGuiH, ui_theme, 3.132))
+g_ui[1].new_text("Cooldown", "HILDR", "auto", "title", "dadada")
+g_ui[1].show()
 return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 StartStop(*) {
-    ui[1].edit_text("Cooldown", "GAGA")
+    g_ui[1].edit_text("Cooldown", "GAGA")
     Send "{Blind}{" g_key["abilities"]["secondA"] "}"
     Send "{Blind}{" g_key["game"]["shoot2"] "}"
 
@@ -56,7 +56,7 @@ StartStop(*) {
     SetTimer AbilitySpam, 0
     SetTimer AltFireSpam, 0
 
-    ui[1].edit_text("Cooldown", "HILDR")
+    g_ui[1].edit_text("Cooldown", "HILDR")
 }
 
 AbilitySpam(*) {

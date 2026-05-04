@@ -1,5 +1,8 @@
 #Requires AutoHotkey v2.0
 
+#Include utils.ahk
+#Include timers.ahk
+
 _cfg(cfg, name, default) {
     if !IsObject(cfg)
         return default
