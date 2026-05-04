@@ -13,23 +13,16 @@ _cfg(cfg, name, default) {
     return default
 }
 
-class Vector {
-    __New(vec_x, vec_y) {
-        this.x := vec_x
-        this.y := vec_y
-    }
+_fmtColor(c) {
+    return (c is Number) ? Format("{:06X}", c) : c
+}
 
-    add(params*) {
-        if (params.Length == 1)
-            return Vector(this.x + params[1].x, this.y + params[1].y)
-        else if (params.Length == 2)
-            return Vector(this.x + params[1], this.y + params[2])
-        return Vector(0, 0)
-    }
-
-    swap() {
-        return Vector(this.y, this.x)
-    }
+_vec(params*) {
+    if (params.Length == 1)
+        return params[1]
+    if (params.Length == 2)
+        return Vector(params[1], params[2])
+    return Vector(0, 0)
 }
 
 ArraysEqual(arr1, arr2) {
@@ -47,6 +40,69 @@ ArraysEqual(arr1, arr2) {
         }
     }
     return true
+}
+
+class Vector {
+    __New(vec_x, vec_y) {
+        this.x := vec_x
+        this.y := vec_y
+    }
+
+    add(params*) {
+        v := _vec(params*)
+        return Vector(this.x + v.x, this.y + v.y)
+    }
+
+    sub(other) {
+        return Vector(this.x - other.x, this.y - other.y)
+    }
+
+    swap() {
+        return Vector(this.y, this.x)
+    }
+}
+
+_build_side_outline(name, vec_pos, vec_size, sides, bold, border, color, alpha) {
+    ol_r := sides[1], ol_l := sides[3]
+    size_w := vec_size.x
+    size_h := vec_size.y
+    border2 := border * 2
+    ol_sum := ol_r + ol_l
+    ol_cond := ol_sum = 2 ? 0 : (ol_sum = 0 ? border2 : border)
+
+    layout := [
+        [vec_pos.add(-bold, -border), Vector(bold, size_h + border2)],
+        [vec_pos.add(-bold + (ol_r ? 0 : bold - border), -bold), Vector(size_w + bold * ol_sum + ol_cond, bold)],
+        [vec_pos.add(size_w, -border), Vector(bold, size_h + border2)],
+        [vec_pos.add(-bold + (ol_r ? 0 : bold - border), size_h), Vector(size_w + bold * ol_sum + ol_cond, bold)]
+    ]
+
+    elements := []
+    for i, val in sides
+        if (val)
+            elements.Push(Line(name "_ol_" A_Index, layout[i][1], layout[i][2], {color: color, alpha: alpha}))
+    return elements
+}
+
+_build_corner_outline(name, vec_pos, vec_size, bold, len, color, alpha) {
+    size_w := vec_size.x
+    size_h := vec_size.y
+
+    layout := [
+        [vec_pos.add(-bold, 0), Vector(bold, len)],
+        [vec_pos.add(-bold, size_h - len), Vector(bold, len)],
+        [vec_pos.add(-bold, -bold), Vector(len + bold, bold)],
+        [vec_pos.add(size_w - len, -bold), Vector(len + bold, bold)],
+        [vec_pos.add(size_w, 0), Vector(bold, len)],
+        [vec_pos.add(size_w, size_h - len), Vector(bold, len)],
+        [vec_pos.add(-bold, size_h), Vector(len + bold, bold)],
+        [vec_pos.add(size_w - len, size_h), Vector(len + bold, bold)]
+    ]
+
+    elements := []
+    for i, val in layout
+        elements.Push(Line(name "_ol_" A_Index, layout[i][1], layout[i][2], {color: color, alpha: alpha}))
+    return elements
 }
 
 class Text {
@@ -159,39 +215,23 @@ class Text {
     }
 
     new_pos(params*) {
-        if (params.Length == 1)
-            this.pos := params[1]
-        else if (params.Length == 2) {
-            this.pos.x := params[1]
-            this.pos.y := params[2]
-        }
+        this.pos := _vec(params*)
         this.show()
     }
 
     move(params*) {
-        if (params.Length == 1)
-            this.pos := this.pos.add(params[1])
-        else if (params.Length == 2)
-            this.pos := this.pos.add(Vector(params[1], params[2]))
+        this.pos := this.pos.add(params*)
         this.show()
     }
 
     new_size(params*) {
-        if (params.Length == 1)
-            this.size := params[1]
-        else if (params.Length == 2) {
-            this.size.x := params[1]
-            this.size.y := params[2]
-        }
+        this.size := _vec(params*)
         this._refit_controls()
         this.show()
     }
 
     resize(params*) {
-        if (params.Length == 1)
-            this.size := this.size.add(params[1])
-        else if (params.Length == 2)
-            this.size := this.size.add(Vector(params[1], params[2]))
+        this.size := this.size.add(params*)
         this._refit_controls()
         this.show()
     }
@@ -236,26 +276,22 @@ class Picture {
         this.add_x := _cfg(cfg, "x", 0)
         this.add_y := _cfg(cfg, "y", 0)
 
+        bgStr := _fmtColor(this.bgCol)
+
         this.gui := Gui("+AlwaysOnTop -Caption +LastFound -SysMenu +ToolWindow -DPIScale +E0x20")
         this.gui.MarginX := 0
         this.gui.MarginY := 0
-        this.gui.BackColor := this._fmtColor(this.bgCol)
+        this.gui.BackColor := bgStr
 
         if (this.bgAlp != 255)
             WinSetTransparent(this.bgAlp, this.gui.Hwnd)
         else
-            WinSetTransColor(this._fmtColor(this.bgCol), this.gui.Hwnd)
+            WinSetTransColor(bgStr, this.gui.Hwnd)
 
         path := A_ScriptDir "\pictures\" name
         this.picture := this.gui.Add("Picture", "w" this.size.x " h" this.size.y " x" this.add_x " y" this.add_y " AltSubmit BackgroundTrans", path)
 
         this.hwnd := this.gui.Hwnd
-    }
-
-    _fmtColor(c) {
-        if (c is Number)
-            return Format("{:06X}", c)
-        return c
     }
 
     show() {
@@ -267,38 +303,22 @@ class Picture {
     }
 
     new_pos(params*) {
-        if (params.Length == 1)
-            this.pos := params[1]
-        else if (params.Length == 2) {
-            this.pos.x := params[1]
-            this.pos.y := params[2]
-        }
+        this.pos := _vec(params*)
         this.show()
     }
 
     move(params*) {
-        if (params.Length == 1)
-            this.pos := this.pos.add(params[1])
-        else if (params.Length == 2)
-            this.pos := this.pos.add(Vector(params[1], params[2]))
+        this.pos := this.pos.add(params*)
         this.show()
     }
 
     new_size(params*) {
-        if (params.Length == 1)
-            this.size := params[1]
-        else if (params.Length == 2) {
-            this.size.x := params[1]
-            this.size.y := params[2]
-        }
+        this.size := _vec(params*)
         this.show()
     }
 
     resize(params*) {
-        if (params.Length == 1)
-            this.size := this.size.add(params[1])
-        else if (params.Length == 2)
-            this.size := this.size.add(Vector(params[1], params[2]))
+        this.size := this.size.add(params*)
         this.show()
     }
 
@@ -324,6 +344,7 @@ class Line {
         this.border := _cfg(cfg, "border", 0)
         this.blur := _cfg(cfg, "blur", 0)
         this.noBG := _cfg(cfg, "no_bg", 0)
+        this._blur_applied := false
 
         opts := "+AlwaysOnTop -Caption +LastFound -SysMenu +ToolWindow -DPIScale +E0x20"
         if (this.border)
@@ -332,7 +353,7 @@ class Line {
         this.gui := Gui(opts)
         this.gui.MarginX := 0
         this.gui.MarginY := 0
-        this.gui.BackColor := this.noBG ? "151515" : this._fmtColor(this.bgCol)
+        this.gui.BackColor := this.noBG ? "151515" : _fmtColor(this.bgCol)
 
         if (this.blur)
             WinSetTransColor("151515", this.gui.Hwnd)
@@ -342,45 +363,23 @@ class Line {
         this.hwnd := this.gui.Hwnd
     }
 
-    _fmtColor(c) {
-        if (c is Number)
-            return Format("{:06X}", c)
-        return c
-    }
-
     new_pos(params*) {
-        if (params.Length == 1)
-            this.pos := params[1]
-        else if (params.Length == 2) {
-            this.pos.x := params[1]
-            this.pos.y := params[2]
-        }
+        this.pos := _vec(params*)
         this.show()
     }
 
     move(params*) {
-        if (params.Length == 1)
-            this.pos := this.pos.add(params[1])
-        else if (params.Length == 2)
-            this.pos := this.pos.add(Vector(params[1], params[2]))
+        this.pos := this.pos.add(params*)
         this.show()
     }
 
     new_size(params*) {
-        if (params.Length == 1)
-            this.size := params[1]
-        else if (params.Length == 2) {
-            this.size.x := params[1]
-            this.size.y := params[2]
-        }
+        this.size := _vec(params*)
         this.show()
     }
 
     resize(params*) {
-        if (params.Length == 1)
-            this.size := this.size.add(params[1])
-        else if (params.Length == 2)
-            this.size := this.size.add(Vector(params[1], params[2]))
+        this.size := this.size.add(params*)
         this.show()
     }
 
@@ -409,8 +408,10 @@ class Line {
         y := this.pos.y + (this.blur && this.border ? -1 : 0)
         this.gui.Show("x" x " y" y " w" this.size.x " h" this.size.y " NoActivate")
 
-        if (this.blur)
+        if (this.blur && !this._blur_applied) {
             this._set_blur(this.hwnd)
+            this._blur_applied := true
+        }
     }
 
     hide() {
@@ -457,17 +458,11 @@ class Slider {
         this.gui.BackColor := "FFFFFF"
         WinSetTransColor("FFFFFF", this.gui.Hwnd)
 
-        this.progress := this.gui.Add("Progress", "x0 y0 w" this.size.x " h" this.size.y " c" this._fmtColor(this.color) " Background" this._fmtColor(this.bgCol), this.val)
+        this.progress := this.gui.Add("Progress", "x0 y0 w" this.size.x " h" this.size.y " c" _fmtColor(this.color) " Background" _fmtColor(this.bgCol), this.val)
 
         this._draw_outline(vec_pos, vec_size)
 
         this.hwnd := this.gui.Hwnd
-    }
-
-    _fmtColor(c) {
-        if (c is Number)
-            return Format("{:06X}", c)
-        return c
     }
 
     run(Config := unset) {
@@ -525,61 +520,50 @@ class Slider {
         this.progress.Value := Clamp(new_val, 0, 100)
     }
 
+    _has_outline() {
+        return !ArraysEqual(this.outline, [0, 0, 0, 0])
+    }
+
     new_pos(new_pos) {
-        if !ArraysEqual(this.outline, [0, 0, 0, 0]) {
-            this.outline_elements := []
-            this._draw_outline(new_pos, this.size)
-        }
+        delta := new_pos.sub(this.pos)
+        for idx, element in this.outline_elements
+            element.move(delta)
         this.pos := new_pos
         this.show()
     }
 
     move(add_pos*) {
-        if !ArraysEqual(this.outline, [0, 0, 0, 0])
-            for i, element in this.outline_elements
-                element.move(add_pos*)
-
-        if (add_pos.Length == 1)
-            this.pos := this.pos.add(add_pos[1])
-        else if (add_pos.Length == 2)
-            this.pos := this.pos.add(Vector(add_pos[1], add_pos[2]))
-
+        for idx, element in this.outline_elements
+            element.move(add_pos*)
+        this.pos := this.pos.add(add_pos*)
         this.show()
     }
 
     new_size(new_size*) {
-        if !ArraysEqual(this.outline, [0, 0, 0, 0]) {
+        new_w := new_size.Length == 1 ? new_size[1].x : new_size[1]
+        new_sz := Vector(new_w, this.size.y)
+
+        if (this._has_outline()) {
             this.outline_elements := []
-            if (new_size.Length == 1)
-                this._draw_outline(this.pos, Vector(new_size[1].x, this.size.y))
-            else if (new_size.Length == 2)
-                this._draw_outline(this.pos, Vector(new_size[1], this.size.y))
+            this._draw_outline(this.pos, new_sz)
         }
 
-        if (new_size.Length == 1)
-            this.size := Vector(new_size[1].x, this.size.y)
-        else if (new_size.Length == 2)
-            this.size.x := new_size[1]
-
-        this.progress := this.gui.Add("Progress", "x0 y0 w" this.size.x " h" this.size.y " c" this._fmtColor(this.color) " Background" this._fmtColor(this.bgCol), this.val)
+        this.size := new_sz
+        this.progress.Move(, , this.size.x, this.size.y)
         this.show()
     }
 
     resize(add_size*) {
-        if !ArraysEqual(this.outline, [0, 0, 0, 0]) {
+        delta_w := add_size.Length == 1 ? add_size[1].x : add_size[1]
+        new_sz := Vector(this.size.x + delta_w, this.size.y)
+
+        if (this._has_outline()) {
             this.outline_elements := []
-            if (add_size.Length == 1)
-                this._draw_outline(this.pos, this.size.add(add_size[1].x, 0))
-            else if (add_size.Length == 2)
-                this._draw_outline(this.pos, this.size.add(add_size[1], 0))
+            this._draw_outline(this.pos, new_sz)
         }
 
-        if (add_size.Length == 1)
-            this.size := this.size.add(add_size[1].x, 0)
-        else if (add_size.Length == 2)
-            this.size := this.size.add(add_size[1], 0)
-
-        this.progress := this.gui.Add("Progress", "x0 y0 w" this.size.x " h" this.size.y " c" this._fmtColor(this.color) " Background" this._fmtColor(this.bgCol), this.val)
+        this.size := new_sz
+        this.progress.Move(, , this.size.x, this.size.y)
         this.show()
     }
 
@@ -588,27 +572,8 @@ class Slider {
     }
 
     _draw_outline(vec_pos, vec_size) {
-        ol_r := this.outline[1], ol_l := this.outline[3]
         border := this.border ? 1 : 0
-
-        bold := this.outline_sz
-        size_w := vec_size.x
-        size_h := vec_size.y
-
-        border2 := border * 2
-        ol_sum := ol_r + ol_l
-        ol_cond := (ol_sum = 2 ? 0 : ol_sum = 0 ? border2 : border)
-
-        layout := [
-            [vec_pos.add(-bold, -border), Vector(bold, size_h + border2)],
-            [vec_pos.add(-bold + (ol_r ? 0 : bold - border), -bold), Vector(size_w + bold * ol_sum + ol_cond, bold)],
-            [vec_pos.add(size_w, -border), Vector(bold, size_h + border2)],
-            [vec_pos.add(-bold + (ol_r ? 0 : bold - border), size_h), Vector(size_w + bold * ol_sum + ol_cond, bold)]
-        ]
-
-        for i, val in this.outline
-            if (val)
-                this.outline_elements.Push(Line(this.name "_ol_" A_Index, layout[i][1], layout[i][2], {color: this.olCol, alpha: this.olAlp}))
+        this.outline_elements := _build_side_outline(this.name, vec_pos, vec_size, this.outline, this.outline_sz, border, this.olCol, this.olAlp)
     }
 
     show() {
@@ -628,27 +593,14 @@ class Slider {
 
     __Delete() {
         this.gui.Destroy()
-        for idx, element in this.outline_elements
-            element.__Delete()
     }
 }
 
 class Window {
-    __New(name, args*) {
-        ; Supports two call forms:
-        ;   Window(name, vec_pos, vec_size, theme, Config?)
-        ;   Window(name, x, y, w, h, theme, Config?)
-        if (args.Length >= 1 && (args[1] is Number)) {
-            vec_pos  := Vector(args[1], args[2])
-            vec_size := Vector(args[3], args[4])
-            theme    := args[5]
-            cfg      := args.Length >= 6 ? args[6] : ""
-        } else {
-            vec_pos  := args[1]
-            vec_size := args[2]
-            theme    := args[3]
-            cfg      := args.Length >= 4 ? args[4] : ""
-        }
+    __New(name, x, y, w, h, theme, Config := unset) {
+        cfg := IsSet(Config) ? Config : ""
+        vec_pos := Vector(x, y)
+        vec_size := Vector(w, h)
 
         this.name := name
         this.pos := vec_pos
@@ -692,10 +644,7 @@ class Window {
         this.outline_elements := []
         this.sliders := Map()
 
-        if (this.outline != "corner")
-            this._draw_outline(vec_pos, vec_size)
-        else
-            this._draw_corner_outline(vec_pos, vec_size)
+        this._redraw_outline(vec_pos, vec_size)
     }
 
     new_slider(name, vec_pos, vec_size, min, max, cur, Config := unset) {
@@ -740,49 +689,47 @@ class Window {
         return this.text_window.measure(control_name)
     }
 
-    new_pos(new_pos*) {
-        cur_win_pos := this.pos
+    _has_side_outline() {
+        return this.outline is Array && !ArraysEqual(this.outline, [0, 0, 0, 0])
+    }
 
-        for idx, element in this.sliders {
-            real_pos := element.pos.add(-cur_win_pos.x, -cur_win_pos.y)
-            if (new_pos.Length == 1)
-                element.new_pos(new_pos[1].add(real_pos))
-            else if (new_pos.Length == 2)
-                element.new_pos(Vector(new_pos[1] + real_pos.x, new_pos[2] + real_pos.y))
-        }
+    _has_outline() {
+        return this.outline == "corner" || this._has_side_outline()
+    }
+
+    _redraw_outline(vec_pos, vec_size) {
+        if (this.outline == "corner")
+            this.outline_elements := _build_corner_outline(this.name, vec_pos, vec_size, this.outline_sz, this.outline_len, this.outline_cl, this.outline_al)
+        else if (this._has_side_outline()) {
+            border := this.blur ? this.border : 0
+            this.outline_elements := _build_side_outline(this.name, vec_pos, vec_size, this.outline, this.outline_sz, border, this.outline_cl, this.outline_al)
+        } else
+            this.outline_elements := []
+    }
+
+    new_pos(new_pos*) {
+        target := _vec(new_pos*)
+        delta := target.sub(this.window.pos)
+
+        for idx, element in this.sliders
+            element.move(delta)
 
         if (this.blur)
-            this.blur_window.new_pos(new_pos*)
+            this.blur_window.move(delta)
 
-        if (this.outline is Array && !ArraysEqual(this.outline, [0, 0, 0, 0])) {
-            this.outline_elements := []
-            if (this.outline != "corner")
-                this._draw_outline(this.window.pos, this.window.size)
-            else
-                this._draw_corner_outline(this.window.pos, this.window.size)
-            for idx, element in this.outline_elements
-                element.show()
-        } else if (this.outline == "corner") {
-            this.outline_elements := []
-            this._draw_corner_outline(this.window.pos, this.window.size)
-            for idx, element in this.outline_elements
-                element.show()
-        }
+        for idx, element in this.outline_elements
+            element.move(delta)
 
-        this.window.new_pos(new_pos*)
-        this.text_window.new_pos(new_pos*)
+        this.window.move(delta)
+        this.text_window.move(delta)
     }
 
     move(add_pos*) {
         if (this.blur)
             this.blur_window.move(add_pos*)
 
-        if (this.outline is Array && !ArraysEqual(this.outline, [0, 0, 0, 0]))
-            for i, element in this.outline_elements
-                element.move(add_pos*)
-        else if (this.outline == "corner")
-            for i, element in this.outline_elements
-                element.move(add_pos*)
+        for i, element in this.outline_elements
+            element.move(add_pos*)
 
         this.window.move(add_pos*)
         this.text_window.move(add_pos*)
@@ -792,108 +739,42 @@ class Window {
     }
 
     new_size(new_size*) {
-        if (this.outline is Array && !ArraysEqual(this.outline, [0, 0, 0, 0])) {
-            this.outline_elements := []
-            if (new_size.Length == 1) {
-                if (this.outline != "corner")
-                    this._draw_outline(this.window.pos, new_size[1])
-                else
-                    this._draw_corner_outline(this.window.pos, new_size[1])
-            } else if (new_size.Length == 2) {
-                if (this.outline != "corner")
-                    this._draw_outline(this.window.pos, Vector(new_size[1], new_size[2]))
-                else
-                    this._draw_corner_outline(this.window.pos, Vector(new_size[1], new_size[2]))
-            }
+        target_size := _vec(new_size*)
+
+        if (this._has_outline()) {
+            this._redraw_outline(this.window.pos, target_size)
             for idx, element in this.outline_elements
                 element.show()
         }
 
         if (this.blur)
-            this.blur_window.new_size(new_size*)
+            this.blur_window.new_size(target_size)
 
-        this.window.new_size(new_size*)
-        this.text_window.new_size(new_size*)
+        this.window.new_size(target_size)
+        this.text_window.new_size(target_size)
 
-        for idx, element in this.sliders {
-            if (new_size.Length == 1)
-                element.new_size(Vector(new_size[1].x - (element.pos.x - this.pos.x) * 2, new_size[1].y))
-            else if (new_size.Length == 2)
-                element.new_size(new_size[1] - (element.pos.x - this.pos.x) * 2, new_size[2])
-        }
+        for idx, element in this.sliders
+            element.new_size(Vector(target_size.x - (element.pos.x - this.pos.x) * 2, target_size.y))
     }
 
     resize(add_size*) {
-        if (this.outline is Array && !ArraysEqual(this.outline, [0, 0, 0, 0])) {
-            this.outline_elements := []
-            if (add_size.Length == 1) {
-                if (this.outline != "corner")
-                    this._draw_outline(this.window.pos, this.window.size.add(add_size[1].x, add_size[1].y))
-                else
-                    this._draw_corner_outline(this.window.pos, this.window.size.add(add_size[1].x, add_size[1].y))
-            } else if (add_size.Length == 2) {
-                if (this.outline != "corner")
-                    this._draw_outline(this.window.pos, this.window.size.add(add_size[1], add_size[2]))
-                else
-                    this._draw_corner_outline(this.window.pos, this.window.size.add(add_size[1], add_size[2]))
-            }
+        delta := _vec(add_size*)
+        new_sz := this.window.size.add(delta)
+
+        if (this._has_outline()) {
+            this._redraw_outline(this.window.pos, new_sz)
             for idx, element in this.outline_elements
                 element.show()
         }
 
         if (this.blur)
-            this.blur_window.resize(add_size*)
+            this.blur_window.resize(delta)
 
-        this.window.resize(add_size*)
-        this.text_window.resize(add_size*)
+        this.window.resize(delta)
+        this.text_window.resize(delta)
 
         for idx, element in this.sliders
-            element.resize(add_size*)
-    }
-
-    _draw_outline(vec_pos, vec_size) {
-        ol_r := this.outline[1], ol_l := this.outline[3]
-        border := this.blur ? this.border : 0
-
-        bold := this.outline_sz
-        size_w := vec_size.x
-        size_h := vec_size.y
-
-        border2 := border * 2
-        ol_sum := ol_r + ol_l
-        ol_cond := (ol_sum = 2 ? 0 : ol_sum = 0 ? border2 : border)
-
-        layout := [
-            [vec_pos.add(-bold, -border), Vector(bold, size_h + border2)],
-            [vec_pos.add(-bold + (ol_r ? 0 : bold - border), -bold), Vector(size_w + bold * ol_sum + ol_cond, bold)],
-            [vec_pos.add(size_w, -border), Vector(bold, size_h + border2)],
-            [vec_pos.add(-bold + (ol_r ? 0 : bold - border), size_h), Vector(size_w + bold * ol_sum + ol_cond, bold)]
-        ]
-
-        for i, val in this.outline
-            if (val)
-                this.outline_elements.Push(Line(this.name "_ol_" A_Index, layout[i][1], layout[i][2], {color: this.outline_cl, alpha: this.outline_al}))
-    }
-
-    _draw_corner_outline(vec_pos, vec_size) {
-        bold := this.outline_sz
-        len := this.outline_len
-        size_w := vec_size.x
-        size_h := vec_size.y
-
-        layout := [
-            [vec_pos.add(-bold, 0), Vector(bold, len)],
-            [vec_pos.add(-bold, size_h - len), Vector(bold, len)],
-            [vec_pos.add(-bold, -bold), Vector(len + bold, bold)],
-            [vec_pos.add(size_w - len, -bold), Vector(len + bold, bold)],
-            [vec_pos.add(size_w, 0), Vector(bold, len)],
-            [vec_pos.add(size_w, size_h - len), Vector(bold, len)],
-            [vec_pos.add(-bold, size_h), Vector(len + bold, bold)],
-            [vec_pos.add(size_w - len, size_h), Vector(len + bold, bold)]
-        ]
-
-        for i, val in layout
-            this.outline_elements.Push(Line(this.name "_ol_" A_Index, layout[i][1], layout[i][2], {color: this.outline_cl, alpha: this.outline_al}))
+            element.resize(delta)
     }
 
     show() {
@@ -940,15 +821,14 @@ class Window {
 }
 
 class Ui {
-    __New(theme, no_bg := false) {
+    __New(theme) {
         this.theme := theme
-        this.no_bg := no_bg
         this.windows := Map()
     }
 
-    new_window(name, vec_pos, vec_size, Config := unset) {
+    new_window(name, x, y, w, h, Config := unset) {
         cfg := IsSet(Config) ? Config : ""
-        return this.windows[name] := Window(name, vec_pos, vec_size, this.theme, cfg)
+        return this.windows[name] := Window(name, x, y, w, h, this.theme, cfg)
     }
 
     get_window(name) {
