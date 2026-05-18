@@ -1,4 +1,4 @@
-﻿#Requires AutoHotkey v2.0
+#Requires AutoHotkey v2.0
 
 ; Debug include
 #include %A_ScriptDir%/..
@@ -14,15 +14,11 @@ global ui_theme := {winOL: "ADADAD", alpOL: 255, winBG: "151515", alpBG: 180, ti
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;              Settings               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-settings_json := FileRead(A_ScriptDir "\..\lib\game_settings.json")
-macro_json    := FileRead(A_ScriptDir "\cfg\" StrReplace(A_ScriptName, ".ahk", "") ".json")
+global g_key   := Cfg.FromFile(A_ScriptDir "\..\lib\game_settings.json")
+global g_macro := Cfg.FromFile(A_ScriptDir "\cfg\" StrReplace(A_ScriptName, ".ahk", "") ".json")
 
-global g_key   := json_load(&settings_json)
-global g_macro := json_load(&macro_json)
-
-for hotkeyFunction, hotkeyCombination in g_macro["hk"] {
-    Hotkey("*" . hotkeyCombination["key"], %hotkeyFunction%)
-}
+for fn, combo in g_macro.Hotkeys()
+    Hotkey "*" combo, %fn%
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                 GUI                 ;;
@@ -35,7 +31,7 @@ gPosX := Ceil(A_ScreenWidth * 0.008)
 gPosY := Ceil(A_ScreenHeight * 0.47)
 
 g_ui.Push(Window("gui_chat", gPosX, gPosY, gGuiW, gGuiH, ui_theme, {blur: 1, border: 1, ol: [1, 1, 1, 1]}))
-g_ui[1].new_text("Cooldown", g_macro["val"]["skillKey"]["val"], "auto", "title")
+g_ui[1].new_text("Cooldown", g_macro.V("skillKey"), "auto", "title")
 g_ui[1].show()
 return
 
@@ -43,17 +39,23 @@ return
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 StartStop(*) {
+    skillKey  := g_macro.V("skillKey")
+    tapDelay  := g_macro.V("tapDelay")
+    holdMs    := g_macro.V("holdMs")
+    loopDelay := g_macro.V("loopDelay")
+    toggleKey := g_macro.K("StartStop")
+
     g_ui[1].edit_text("Cooldown", "GO")
 
-    while GetKeyState(g_macro["hk"]["StartStop"]["key"], "p") {
-        SendInput "{Blind}{" g_macro["val"]["skillKey"]["val"] "}"
-        lSleep(g_macro["val"]["tapDelay"]["val"])
+    while GetKeyState(toggleKey, "p") {
+        SendInput "{Blind}{" skillKey "}"
+        lSleep(tapDelay)
 
-        HoldKey(g_macro["val"]["skillKey"]["val"], g_macro["val"]["holdMs"]["val"])
-        lSleep(g_macro["val"]["loopDelay"]["val"])
+        HoldKey(skillKey, holdMs)
+        lSleep(loopDelay)
     }
 
-    g_ui[1].edit_text("Cooldown", g_macro["val"]["skillKey"]["val"])
+    g_ui[1].edit_text("Cooldown", skillKey)
 }
 
 *Insert::Reload

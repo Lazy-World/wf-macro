@@ -1,4 +1,4 @@
-﻿#Requires AutoHotkey v2.0
+#Requires AutoHotkey v2.0
 
 ; Debug include
 #include %A_ScriptDir%/..
@@ -13,17 +13,13 @@ global ui_theme := {winOL: "ADADAD", alpOL: 255, winBG: "151515", alpBG: 180, ti
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;              Settings               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-settings_json := FileRead(A_ScriptDir "\..\lib\game_settings.json")
-macro_json    := FileRead(A_ScriptDir "\cfg\" StrReplace(A_ScriptName, ".ahk", "") ".json")
+global g_key   := Cfg.FromFile(A_ScriptDir "\..\lib\game_settings.json")
+global g_macro := Cfg.FromFile(A_ScriptDir "\cfg\" StrReplace(A_ScriptName, ".ahk", "") ".json")
 
-global g_key   := json_load(&settings_json)
-global g_macro := json_load(&macro_json)
+global sleepTime := 2000 / g_key.Get("misc.fps", 60)
 
-global sleepTime := 2000 / g_key["misc"]["fps"]
-
-for hotkeyFunction, hotkeyCombination in g_macro["hk"] {
-    Hotkey("*" . hotkeyCombination["key"], %hotkeyFunction%)
-}
+for fn, combo in g_macro.Hotkeys()
+    Hotkey "*" combo, %fn%
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                 GUI                 ;;
@@ -44,12 +40,16 @@ return
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 StartStop(*) {
+    shoot     := g_key.Get("game.shoot")
+    toggleKey := g_macro.K("StartStop")
+    shootHold := g_macro.V("shootHold")
+
     g_ui[1].edit_text("Cooldown", "PEPE")
 
-    while GetKeyState(g_macro["hk"]["StartStop"]["key"], "p") {
-        SendInput "{Blind}{" g_key["game"]["shoot"] " Down}"
-        lSleep(g_macro["val"]["shootHold"]["val"])
-        SendInput "{Blind}{" g_key["game"]["shoot"] " Up}"
+    while GetKeyState(toggleKey, "p") {
+        SendInput "{Blind}{" shoot " Down}"
+        lSleep(shootHold)
+        SendInput "{Blind}{" shoot " Up}"
 
         lSleep(sleepTime)
         ZawThrow()
@@ -59,15 +59,19 @@ StartStop(*) {
 }
 
 ZawThrow() {
-    SendInput "{Blind}{" g_key["game"]["jump"] "}"
+    jump  := g_key.Get("game.jump")
+    aim   := g_key.Get("game.aim")
+    melee := g_key.Get("game.melee")
+
+    SendInput "{Blind}{" jump "}"
     lSleep(sleepTime)
-    SendInput "{Blind}{" g_key["game"]["jump"] "}"
+    SendInput "{Blind}{" jump "}"
     lSleep(sleepTime)
-    SendInput "{Blind}{" g_key["game"]["aim"] " Down}"
+    SendInput "{Blind}{" aim " Down}"
     lSleep(sleepTime)
-    SendInput "{Blind}{" g_key["game"]["melee"] "}"
+    SendInput "{Blind}{" melee "}"
     lSleep(sleepTime)
-    SendInput "{Blind}{" g_key["game"]["aim"] " Up}"
+    SendInput "{Blind}{" aim " Up}"
     lSleep(sleepTime)
 }
 

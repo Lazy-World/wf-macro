@@ -9,20 +9,18 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;              Settings               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-macro_json       := FileRead(A_ScriptDir "\cfg\" StrReplace(A_ScriptName, ".ahk", "") ".json")
-global g_macro    := json_load(&macro_json)
+global g_macro := Cfg.FromFile(A_ScriptDir "\cfg\" StrReplace(A_ScriptName, ".ahk", "") ".json")
 
-for hotkeyFunction, hotkeyCombination in g_macro["hk"] {
-    Hotkey("*" . hotkeyCombination["key"], %hotkeyFunction%)
-}
+for fn, combo in g_macro.Hotkeys()
+    Hotkey "*" combo, %fn%
 return
 
 testDelay(*) {
-    if !g_macro["val"]["enableTest"]["val"]
+    if !g_macro.V("enableTest")
         return
-                                                         
-    SendInput "{" g_macro["keys"]["tab"] "}"
-    Sleep(g_macro["val"]["sleep1"]["val"])
+
+    SendInput "{" g_macro.Get("keys.tab") "}"
+    Sleep g_macro.V("sleep1")
 }
 
 *Insert::Reload

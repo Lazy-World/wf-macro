@@ -1,4 +1,4 @@
-﻿#Requires AutoHotkey v2.0
+#Requires AutoHotkey v2.0
 
 ; Debug include
 #include %A_ScriptDir%/..
@@ -13,15 +13,11 @@ global ui_theme := {winOL: "ADADAD", alpOL: 255, winBG: "151515", alpBG: 180, ti
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;              Settings               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-settings_json := FileRead(A_ScriptDir "\..\lib\game_settings.json")
-macro_json    := FileRead(A_ScriptDir "\cfg\" StrReplace(A_ScriptName, ".ahk", "") ".json")
+global g_key   := Cfg.FromFile(A_ScriptDir "\..\lib\game_settings.json")
+global g_macro := Cfg.FromFile(A_ScriptDir "\cfg\" StrReplace(A_ScriptName, ".ahk", "") ".json")
 
-global g_key   := json_load(&settings_json)
-global g_macro := json_load(&macro_json)
-
-for hotkeyFunction, hotkeyCombination in g_macro["hk"] {
-    Hotkey("*" . hotkeyCombination["key"], %hotkeyFunction%)
-}
+for fn, combo in g_macro.Hotkeys()
+    Hotkey "*" combo, %fn%
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                 GUI                 ;;
@@ -42,16 +38,18 @@ return
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 StartStop(*) {
+    toggleKey := g_macro.K("StartStop")
+    pollMs    := g_macro.V("pollMs")
+
     g_ui[1].edit_text("Cooldown", "GAGA")
-    Send "{Blind}{" g_key["abilities"]["secondA"] "}"
-    Send "{Blind}{" g_key["game"]["shoot2"] "}"
+    Send "{Blind}{" g_key.Get("abilities.secondA") "}"
+    Send "{Blind}{" g_key.Get("game.shoot2") "}"
 
-    SetTimer AbilitySpam, g_macro["val"]["ability2Cd"]["val"]
-    SetTimer AltFireSpam, g_macro["val"]["altFireCd"]["val"]
+    SetTimer AbilitySpam, g_macro.V("ability2Cd")
+    SetTimer AltFireSpam, g_macro.V("altFireCd")
 
-    while GetKeyState(g_macro["hk"]["StartStop"]["key"], "p") {
-        lSleep(g_macro["val"]["pollMs"]["val"])
-    }
+    while GetKeyState(toggleKey, "p")
+        lSleep(pollMs)
 
     SetTimer AbilitySpam, 0
     SetTimer AltFireSpam, 0
@@ -60,11 +58,11 @@ StartStop(*) {
 }
 
 AbilitySpam(*) {
-    Send "{Blind}{" g_key["abilities"]["secondA"] "}"
+    Send "{Blind}{" g_key.Get("abilities.secondA") "}"
 }
 
 AltFireSpam(*) {
-    Send "{Blind}{" g_key["game"]["shoot2"] "}"
+    Send "{Blind}{" g_key.Get("game.shoot2") "}"
 }
 
 *Insert::Reload

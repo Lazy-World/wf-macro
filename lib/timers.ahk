@@ -9,10 +9,6 @@ GetQPC() {
     return v
 }
 
-TimeStamp() {
-    return GetQPC()
-}
-
 lSleep(s_time, start := 0) {
     global Frequency
 

@@ -1,4 +1,4 @@
-﻿#Requires AutoHotkey v2.0
+#Requires AutoHotkey v2.0
 
 ; Debug include
 #include %A_ScriptDir%/..
@@ -13,15 +13,11 @@ global ui_theme := {winOL: "ADADAD", alpOL: 255, winBG: "151515", alpBG: 180, ti
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;              Settings               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-settings_json := FileRead(A_ScriptDir "\..\lib\game_settings.json")
-macro_json    := FileRead(A_ScriptDir "\cfg\" StrReplace(A_ScriptName, ".ahk", "") ".json")
+global g_key   := Cfg.FromFile(A_ScriptDir "\..\lib\game_settings.json")
+global g_macro := Cfg.FromFile(A_ScriptDir "\cfg\" StrReplace(A_ScriptName, ".ahk", "") ".json")
 
-global g_key   := json_load(&settings_json)
-global g_macro := json_load(&macro_json)
-
-for hotkeyFunction, hotkeyCombination in g_macro["hk"] {
-    Hotkey("*" . hotkeyCombination["key"], %hotkeyFunction%)
-}
+for fn, combo in g_macro.Hotkeys()
+    Hotkey "*" combo, %fn%
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                 GUI                 ;;
@@ -42,18 +38,24 @@ return
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 StartStop(*) {
+    jump     := g_key.Get("game.jump")
+    aim      := g_key.Get("game.aim")
+    melee    := g_key.Get("game.melee")
+    interval := g_macro.V("interval")
+    endDelay := g_macro.V("endDelay")
+
     g_ui[1].edit_text("Cooldown", "GO")
 
-    SendInput "{Blind}{" g_key["game"]["jump"] "}"
-    lSleep(g_macro["val"]["interval"]["val"])
-    SendInput "{Blind}{" g_key["game"]["jump"] "}"
-    lSleep(g_macro["val"]["interval"]["val"])
-    SendInput "{Blind}{" g_key["game"]["aim"] " Down}"
-    lSleep(g_macro["val"]["interval"]["val"])
-    SendInput "{Blind}{" g_key["game"]["melee"] "}"
-    lSleep(g_macro["val"]["interval"]["val"])
-    SendInput "{Blind}{" g_key["game"]["aim"] " Up}"
-    lSleep(g_macro["val"]["endDelay"]["val"])
+    SendInput "{Blind}{" jump "}"
+    lSleep(interval)
+    SendInput "{Blind}{" jump "}"
+    lSleep(interval)
+    SendInput "{Blind}{" aim " Down}"
+    lSleep(interval)
+    SendInput "{Blind}{" melee "}"
+    lSleep(interval)
+    SendInput "{Blind}{" aim " Up}"
+    lSleep(endDelay)
 
     g_ui[1].edit_text("Cooldown", "ZAW")
 }
