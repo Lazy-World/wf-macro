@@ -13,7 +13,7 @@ global ui_theme := {winOL: "ADADAD", alpOL: 255, winBG: "151515", alpBG: 180, ti
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;              Settings               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-global g_key   := Cfg.FromFile(A_ScriptDir "\..\lib\game_settings.json")
+global g_key   := Cfg.FromFile(A_ScriptDir "\..\presets\game_settings.json")
 global g_macro := Cfg.FromFile(A_ScriptDir "\cfg\" StrReplace(A_ScriptName, ".ahk", "") ".json")
 
 global sleepTime := 2000 / g_key.Get("misc.fps", 60)
