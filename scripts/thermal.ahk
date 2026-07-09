@@ -1,62 +1,71 @@
-#Requires AutoHotkey v2.0
-
-; Debug include
 #include %A_ScriptDir%/..
 
+global ui_theme := {voidTheme: {winOL: "ADADAD", alpOL: 255, winBG: "151515", alpBG: 180, title: "Montserrat Medium", titleCol: "86C8BC", titleSZ: 13, main: "Montserrat Medium", mainCol: "White", mainSZ: 13, info: "Montserrat Medium", infoCol: "FFF6BD", infoSZ: 13}}
+ui_theme := ui_theme.voidTheme
+
+#include presets\game_settings.ahk
+
 #include lib\headers.ahk
-#include lib\json.ahk
+#include lib\custom_ui.ahk
 #include lib\timers.ahk
 #include lib\utils.ahk
-#include lib\ui.ahk
-
-global ui_theme := {winOL: "ADADAD", alpOL: 255, winBG: "151515", alpBG: 180, title: "Montserrat Medium", titleCol: "86C8BC", titleSZ: 13, main: "Montserrat Medium", mainCol: "White", mainSZ: 13, info: "Montserrat Medium", infoCol: "FFF6BD", infoSZ: 13}
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;              Settings               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-global g_key   := Cfg.FromFile(A_ScriptDir "\..\presets\game_settings.json")
-global g_macro := Cfg.FromFile(A_ScriptDir "\cfg\" StrReplace(A_ScriptName, ".ahk", "") ".json")
+#include %A_ScriptDir%
+#include cfg\cfg_%A_Scriptname%
 
-for fn, combo in g_macro.Hotkeys()
-    Hotkey "*" combo, %fn%
+skillKey := 3
+
+Hotkey, *%MiscReloadMacroKey%, MiscReloadMacro
+Hotkey, *%MiscUnloadMacroKey%, MiscUnloadMacro
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;               Hotkeys               ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+Hotkey, *%ThermalKey%, StartStop
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                 GUI                 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-global g_ui := []
+global ui := []
 
 gGuiW := 80
 gGuiH := 28
-gPosX := Ceil(A_ScreenWidth * 0.008)
-gPosY := Ceil(A_ScreenHeight * 0.47)
 
-g_ui.Push(Window("gui_chat", gPosX, gPosY, gGuiW, gGuiH, ui_theme, {blur: 1, border: 1, ol: [1, 1, 1, 1]}))
-g_ui[1].new_text("Cooldown", g_macro.V("skillKey"), "auto", "title")
-g_ui[1].show()
+gPosX := Ceil(gScreen[1] * 0.008)
+gPosY := Ceil(gScreen[2] * 0.47)
+
+ui.push(new Window("gui_chat", gPosX, gPosY, gGuiW, gGuiH, ui_theme, 3.132))
+ui[1].new_text("Cooldown", skillKey, "auto", "title", "dadada")
+ui[1].show()
 return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-StartStop(*) {
-    skillKey  := g_macro.V("skillKey")
-    tapDelay  := g_macro.V("tapDelay")
-    holdMs    := g_macro.V("holdMs")
-    loopDelay := g_macro.V("loopDelay")
-    toggleKey := g_macro.K("StartStop")
+StartStop:
+    ui[1].edit_text("Cooldown", "GO")
 
-    g_ui[1].edit_text("Cooldown", "GO")
-
-    while GetKeyState(toggleKey, "p") {
-        SendInput "{Blind}{" skillKey "}"
-        lSleep(tapDelay)
-
-        HoldKey(skillKey, holdMs)
-        lSleep(loopDelay)
+    While GetKeyState(ThermalKey, "p"){
+        SendInput {Blind}{%skillKey%}
+        lSleep(500)
+        
+        HoldKey(skillKey, 500)
+        lSleep(500)
     }
+    
+    ui[1].edit_text("Cooldown", skillKey)
+Return
 
-    g_ui[1].edit_text("Cooldown", skillKey)
-}
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                Misc                 ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+MiscReloadMacro:
+    reload
+return
 
-*Insert::Reload
-*Del::ExitApp
+MiscUnloadMacro:
+    exitapp
+return

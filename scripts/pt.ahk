@@ -1,79 +1,86 @@
-#Requires AutoHotkey v2.0
-
-; Debug include
 #include %A_ScriptDir%/..
 
-#include lib\headers.ahk
-#include lib\json.ahk
-#include lib\timers.ahk
-#include lib\ui.ahk
+global ui_theme := {voidTheme: {winOL: "ADADAD", alpOL: 255, winBG: "151515", alpBG: 180, title: "Montserrat Medium", titleCol: "86C8BC", titleSZ: 13, main: "Montserrat Medium", mainCol: "White", mainSZ: 13, info: "Montserrat Medium", infoCol: "FFF6BD", infoSZ: 13}}
+ui_theme := ui_theme.voidTheme
 
-global ui_theme := {winOL: "ADADAD", alpOL: 255, winBG: "151515", alpBG: 180, title: "Montserrat Medium", titleCol: "86C8BC", titleSZ: 13, main: "Montserrat Medium", mainCol: "White", mainSZ: 13, info: "Montserrat Medium", infoCol: "FFF6BD", infoSZ: 13}
+#include presets\game_settings.ahk
+
+#include lib\headers.ahk
+#include lib\custom_ui.ahk
+#include lib\timers.ahk
+#include lib\utils.ahk
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;              Settings               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-global g_key   := Cfg.FromFile(A_ScriptDir "\..\presets\game_settings.json")
-global g_macro := Cfg.FromFile(A_ScriptDir "\cfg\" StrReplace(A_ScriptName, ".ahk", "") ".json")
+#include %A_ScriptDir%
+#include cfg\cfg_%A_Scriptname%
 
-global sleepTime := 2000 / g_key.Get("misc.fps", 60)
+Hotkey, *%MiscReloadMacroKey%, MiscReloadMacro
+Hotkey, *%MiscUnloadMacroKey%, MiscUnloadMacro
 
-for fn, combo in g_macro.Hotkeys()
-    Hotkey "*" combo, %fn%
+global sleepTime := 2000/fps
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;               Hotkeys               ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+Hotkey, *%StartStopKey%, StartStop
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                 GUI                 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-global g_ui := []
+global ui := []
 
 gGuiW := 80
 gGuiH := 28
-gPosX := Ceil(A_ScreenWidth * 0.008)
-gPosY := Ceil(A_ScreenHeight * 0.47)
 
-g_ui.Push(Window("gui_chat", gPosX, gPosY, gGuiW, gGuiH, ui_theme, {blur: 1, border: 1, ol: [1, 1, 1, 1]}))
-g_ui[1].new_text("Cooldown", "PT", "auto", "title")
-g_ui[1].show()
+gPosX := Ceil(gScreen[1] * 0.008)
+gPosY := Ceil(gScreen[2] * 0.47)
+
+ui.push(new Window("gui_chat", gPosX, gPosY, gGuiW, gGuiH, ui_theme, 3.132))
+ui[1].new_text("Cooldown", "PT", "auto", "title", "dadada")
+ui[1].show()
 return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-StartStop(*) {
-    shoot     := g_key.Get("game.shoot")
-    toggleKey := g_macro.K("StartStop")
-    shootHold := g_macro.V("shootHold")
+StartStop:
+	ui[1].edit_text("Cooldown", "PEPE")
+	
+	While GetKeyState(StartStopKey, "p"){
+		SendInput {Blind}{%shootKey% Down}
+		lSleep(550)
+		SendInput {Blind}{%shootKey% Up}
 
-    g_ui[1].edit_text("Cooldown", "PEPE")
+		lSleep(sleepTime)
+		gosub ZawThrow	
+	}
+	
+	ui[1].edit_text("Cooldown", "PT")
+return
 
-    while GetKeyState(toggleKey, "p") {
-        SendInput "{Blind}{" shoot " Down}"
-        lSleep(shootHold)
-        SendInput "{Blind}{" shoot " Up}"
+ZawThrow:
+	global sleepTime
+    SendInput {Blind}{%jumpKey%}
+	lSleep(sleepTime)
+	SendInput {Blind}{%jumpKey%}
+	lSleep(sleepTime)
+	SendInput {Blind}{%aimKey% Down}
+	lSleep(sleepTime)
+	SendInput {Blind}{%meleeKey%}
+	lSleep(sleepTime)
+	SendInput {Blind}{%aimKey% Up}
+	lSleep(sleepTime)
+Return
 
-        lSleep(sleepTime)
-        ZawThrow()
-    }
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                Misc                 ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+MiscReloadMacro:
+    reload
+return
 
-    g_ui[1].edit_text("Cooldown", "PT")
-}
-
-ZawThrow() {
-    jump  := g_key.Get("game.jump")
-    aim   := g_key.Get("game.aim")
-    melee := g_key.Get("game.melee")
-
-    SendInput "{Blind}{" jump "}"
-    lSleep(sleepTime)
-    SendInput "{Blind}{" jump "}"
-    lSleep(sleepTime)
-    SendInput "{Blind}{" aim " Down}"
-    lSleep(sleepTime)
-    SendInput "{Blind}{" melee "}"
-    lSleep(sleepTime)
-    SendInput "{Blind}{" aim " Up}"
-    lSleep(sleepTime)
-}
-
-*Insert::Reload
-*Del::ExitApp
+MiscUnloadMacro:
+    exitapp
+return

@@ -1,69 +1,82 @@
-#Requires AutoHotkey v2.0
-
-; Debug include
 #include %A_ScriptDir%/..
 
-#include lib\headers.ahk
-#include lib\json.ahk
-#include lib\timers.ahk
-#include lib\ui.ahk
+global ui_theme := {voidTheme: {winOL: "ADADAD", alpOL: 255, winBG: "151515", alpBG: 180, title: "Montserrat Medium", titleCol: "86C8BC", titleSZ: 13, main: "Montserrat Medium", mainCol: "White", mainSZ: 13, info: "Montserrat Medium", infoCol: "FFF6BD", infoSZ: 13}}
+ui_theme := ui_theme.voidTheme
 
-global ui_theme := {winOL: "ADADAD", alpOL: 255, winBG: "151515", alpBG: 180, title: "Montserrat Medium", titleCol: "86C8BC", titleSZ: 13, main: "Montserrat Medium", mainCol: "White", mainSZ: 13, info: "Montserrat Medium", infoCol: "FFF6BD", infoSZ: 13}
+#include presets\game_settings.ahk
+
+#include lib\headers.ahk
+#include lib\custom_ui.ahk
+#include lib\timers.ahk
+#include lib\utils.ahk
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;              Settings               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-global g_key   := Cfg.FromFile(A_ScriptDir "\..\presets\game_settings.json")
-global g_macro := Cfg.FromFile(A_ScriptDir "\cfg\" StrReplace(A_ScriptName, ".ahk", "") ".json")
+#include %A_ScriptDir%
+#include cfg\cfg_%A_Scriptname%
 
-for fn, combo in g_macro.Hotkeys()
-    Hotkey "*" combo, %fn%
+Hotkey, *%MiscReloadMacroKey%, MiscReloadMacro
+Hotkey, *%MiscUnloadMacroKey%, MiscUnloadMacro
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;               Hotkeys               ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+Hotkey, *%StartStopKey%, StartStop
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                 GUI                 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-global g_ui := []
+global ui := []
 
 gGuiW := 80
 gGuiH := 28
-gPosX := Ceil(A_ScreenWidth * 0.008)
-gPosY := Ceil(A_ScreenHeight * 0.47)
 
-g_ui.Push(Window("gui_chat", gPosX, gPosY, gGuiW, gGuiH, ui_theme, {blur: 1, border: 1, ol: [1, 1, 1, 1]}))
-g_ui[1].new_text("Cooldown", "HILDR", "auto", "title")
-g_ui[1].show()
+gPosX := Ceil(gScreen[1] * 0.008)
+gPosY := Ceil(gScreen[2] * 0.47)
+
+ui.push(new Window("gui_chat", gPosX, gPosY, gGuiW, gGuiH, ui_theme, 3.132))
+ui[1].new_text("Cooldown", "HILDR", "auto", "title", "dadada")
+ui[1].show()
 return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-StartStop(*) {
-    toggleKey := g_macro.K("StartStop")
-    pollMs    := g_macro.V("pollMs")
+StartStop:
+    ui[1].edit_text("Cooldown", "GAGA")
+    Send, {Blind}{%secondAKey%}
+    Send, {Blind}{%shoot2Key%}
 
-    g_ui[1].edit_text("Cooldown", "GAGA")
-    Send "{Blind}{" g_key.Get("abilities.secondA") "}"
-    Send "{Blind}{" g_key.Get("game.shoot2") "}"
+    SetTimer, AbilitySpam, %Abil_2_Cooldown%
+    SetTimer, AltFireSpam, %Alt_fire_Cooldown%
 
-    SetTimer AbilitySpam, g_macro.V("ability2Cd")
-    SetTimer AltFireSpam, g_macro.V("altFireCd")
+    While GetKeyState(StartStopKey, "p") {
+        lSleep(50)
+    }
 
-    while GetKeyState(toggleKey, "p")
-        lSleep(pollMs)
+    SetTimer, AbilitySpam, off
+    SetTimer, AltFireSpam, off
 
-    SetTimer AbilitySpam, 0
-    SetTimer AltFireSpam, 0
+    ui[1].edit_text("Cooldown", "HILDR")
+Return
 
-    g_ui[1].edit_text("Cooldown", "HILDR")
-}
+AbilitySpam:
+    Send, {Blind}{%secondAKey%}
+return
 
-AbilitySpam(*) {
-    Send "{Blind}{" g_key.Get("abilities.secondA") "}"
-}
+AltFireSpam:
+    
+    Send, {Blind}{%shoot2Key%}
+return
 
-AltFireSpam(*) {
-    Send "{Blind}{" g_key.Get("game.shoot2") "}"
-}
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                Misc                 ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+MiscReloadMacro:
+    reload
+return
 
-*Insert::Reload
-*Del::ExitApp
+MiscUnloadMacro:
+    exitapp
+return

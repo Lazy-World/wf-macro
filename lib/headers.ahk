@@ -1,24 +1,32 @@
-; headers.ahk
-#Requires AutoHotkey v2.0
+; #NoEnv
+; #Persistent
+; #KeyHistory 0
+; #HotkeyInterval 99000000
+; #MaxHotkeysPerInterval 99000000
+; SetDefaultMouseSpeed, 0
+; SetControlDelay, -1
+; SetKeyDelay, -1, -1
+; SetMouseDelay, -1
+; SetBatchLines, -1
+; SetWinDelay, -1
+; SendMode Input
+; ListLines Off
+; CoordMode, Mouse, Client
 
+;---------------------------NEW---------------------------
 #SingleInstance Force
-Persistent
-
-SendMode "Input"
-ProcessSetPriority "A"
-
-SetWorkingDir A_ScriptDir
-ListLines false
-
-SetWinDelay -1
-SetKeyDelay -1, -1
-SetMouseDelay -1
-SetControlDelay -1
-
-A_MaxHotkeysPerInterval := 99000000
+#Persistent
+#NoEnv
+#InstallKeybdHook
+SendMode Input
+Process, Priority,, A
+ListLines Off
+SetWinDelay, -1
+SetBatchLines, -1
+SetKeyDelay, -1, -1
+SetMouseDelay, -1, -1
+SetControlDelay, -1
+#MaxHotkeysPerInterval 99000000
 #MaxThreads 255
-KeyHistory 0
-
-InstallKeybdHook
-
-DllCall("SetThreadDpiAwarenessContext", "ptr", -3, "ptr")
+#KeyHistory 0
+; CoordMode, Mouse, Client

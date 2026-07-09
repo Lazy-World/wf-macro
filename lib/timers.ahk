@@ -1,88 +1,104 @@
-#Requires AutoHotkey v2.0
+global Frequency
+Process, Priority,, A
+DllCall("QueryPerformanceFrequency", "Int64*", Frequency)   
 
-global Frequency := 0
-DllCall("QueryPerformanceFrequency", "Int64*", &Frequency)
-
-GetQPC() {
-    local v := 0
-    DllCall("QueryPerformanceCounter", "Int64*", &v)
-    return v
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;               Lumi                  ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+TimeStamp(ByRef StampName = 0) {
+    Return DllCall("QueryPerformanceCounter", "Int64*", StampName)                        
 }
 
-TimeStamp() {
-    static StampName := 0
-    DllCall("QueryPerformanceCounter", "Int64*", &StampName)
-    return StampName
-}
-
-lSleep(s_time, start := 0) {
-    global Frequency
-
+lSleep(s_time, ByRef start = "") {
     Critical
-    CounterBefore := 0
-    DllCall("QueryPerformanceCounter", "Int64*", &CounterBefore)
+    DllCall("QueryPerformanceCounter", "Int64*", CounterBefore)
 
-    if (start != 0)
+    if (start != "")
         CounterBefore := start
-
+    
+    Frequency ? Frequency : DllCall("QueryPerformanceFrequency", "Int64*", Frequency)
     if (s_time > 20) {
-        CounterAfter := 0
-        DllCall("QueryPerformanceCounter", "Int64*", &CounterAfter)
-        Critical "Off"
-        Sleep s_time - (1000 * (CounterAfter - CounterBefore) / Frequency) - 20
+        DllCall("QueryPerformanceCounter", "Int64*", CounterAfter)
+        Critical Off
+        Sleep % s_time - (1000 * (CounterAfter - CounterBefore) / Frequency) - 20
     }
 
     Critical
-    End := (CounterBefore + (Frequency * (s_time / 1000))) - 1
+    End := (CounterBefore + ( Frequency * (s_time/1000))) - 1
 
-    loop {
-        CounterAfter := 0
-        DllCall("QueryPerformanceCounter", "Int64*", &CounterAfter)
+    loop
+    {
+        DllCall("QueryPerformanceCounter", "Int64*", CounterAfter)
         if (End <= CounterAfter)
             break
     }
-    Critical "Off"
+    Critical Off
 }
 
-MeasureTime(begin, t_end := 0) {
-    global Frequency
-    if (t_end == 0)
-        t_end := GetQPC()
-    return Round(1000 * (t_end - begin) / Frequency, 3)
+; s_time = time in milliseconds to sleep, can be input as a decimal, as accurate as frequency (10 MHz)
+; start = optional parameter, should pass in a QPC timestamp as a variable, will sleep to s_time
+;         after the the timestamp
+;         e.g. lSleep(20, ext) followed by lSleep(40, ext) will only sleep a total 40 ms, not 60 ms
+; the return statement returns the time actually slept, will slow down the sleep marginally
+
+
+MeasureTime(ByRef begin, ByRef t_end := "") {
+    Frequency ? Frequency : DllCall("QueryPerformanceFrequency", "Int64*", Frequency)
+    t_end ? t_end : DllCall("QueryPerformanceCounter", "Int64*", t_end)
+    return Round(( 1000 * (t_end - begin) / Frequency), 3)
 }
+
+; begin/end = pass in two QPC timestamps as variables, returns a rounded difference, mostly a helper func
 
 HoldKey(keyName, duration, wait := 0) {
-    SendInput "{" keyName " down}"
+    SendInput {%keyName% down}
     lSleep(duration)
-    SendInput "{" keyName " up}"
+    SendInput {%keyName% up}
     lSleep(wait)
+    return
 }
 
-TimedKeyLoop(keyName, timeBetweenInputs, endTime, start := 0) {
-    global Frequency
+; keyName = should be a key name or vk code that AHK recognizes
+; duration = how long in milliseconds the key should be held
+; wait = optional parameter, will sleep after the key release (useful for archwing movement)
 
-    if (start == 0)
-        start := GetQPC()
-
-    tkl_end := (start + (Frequency * (endTime / 1000))) - 1
-
+TimedKeyLoop(keyName, timeBetweenInputs, endTime, ByRef start := "") {
+    start ? start : DllCall("QueryPerformanceCounter", "Int64*", start)
+    Frequency ? Frequency : DllCall("QueryPerformanceFrequency", "Int64*", Frequency)
+    tkl_end := (start + ( Frequency * (endTime/1000))) - 1
     loop {
-        SendInput "{" keyName "}"
-
-        tkl_sleep := GetQPC()
-        tkl_sleep_end := (tkl_sleep + (Frequency * (timeBetweenInputs / 1000))) - 1
-
+        SendInput {%keyName%}
+        DllCall("QueryPerformanceCounter", "Int64*", tkl_sleep)
+        tkl_sleep_end := (tkl_sleep + ( Frequency * (timeBetweenInputs/1000))) - 1
         loop {
-            tkl_sleep_time := GetQPC()
-            if (tkl_end < tkl_sleep_time)
-                return
-            if (tkl_sleep_end < tkl_sleep_time)
-                break
-            lSleep(0.3, tkl_sleep_time)
+            DllCall("QueryPerformanceCounter", "Int64*", tkl_sleep_time)
+            if (tkl_end < tkl_sleep_time) 
+                break 2 
+            (tkl_sleep_end < tkl_sleep_time) ? break : lSleep(0.3, tkl_sleep_time)
         }
-
-        tkl_time := GetQPC()
-        if (tkl_end < tkl_time)
-            break
+        until (tkl_sleep_end < tkl_sleep_time)
+        DllCall("QueryPerformanceCounter", "Int64*", tkl_time)
     }
+    until (tkl_end < tkl_time)
+    return
 }
+
+; presses a key at desired interval for desired duration 
+;
+; keyName = should be a key name or vk code that AHK recognizes
+; timeBetweenInputs = time between the key presses
+; endTime = how long in milliseconds the macro will loop for
+; start = see the start variable in lsleep
+
+/*
+F1::
+DllCall("QueryPerformanceCounter", "Int64*", Before)
+
+SendInput {f}
+
+DllCall("QueryPerformanceCounter", "Int64*", After)
+MsgBox % 1000 * (After - Before) / Frequency
+return
+*/
+
+; used to check duration of a macro, leave it commented out just copy paste it somewhere else
