@@ -38,25 +38,28 @@ return
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 StartStop(*) {
+    shootKey  := g_key.get("game.shoot")
     skillKey  := g_macro.V("skillKey")
-    preDelay  := g_macro.V("preDelay")
-    midDelay  := g_macro.V("midDelay")
-    postDelay := g_macro.V("postDelay")
     toggleKey := g_macro.K("StartStop")
+    SpamTime  := g_macro.V("SpamTime")
 
-    g_ui[1].edit_text("Cooldown", "GO: 1")
+    g_ui[1].edit_text("Cooldown", SpamTime)
+    AbilityStart := TimeStamp()
+
     SendInput "{Blind}{" skillKey "}"
-    lSleep(preDelay)
+    SendInput "{Blind}{" shootKey " Down}"
 
-    while GetKeyState(toggleKey, "p") {
-        lSleep(midDelay)
-        g_ui[1].edit_text("Cooldown", "GO: 2")
+    while ( GetKeyState(toggleKey, "P") )
+    {
+        if (SpamTime < MeasureTime(AbilityStart)) {
+            AbilityStart := TimeStamp()
+            SendInput "{Blind}{" skillKey "}"
+        }
 
-        SendInput "{Blind}{" skillKey "}"
-        lSleep(postDelay)
-        break
+        lSleep(50)
     }
 
+    SendInput "{Blind}{" shootKey " Up}"
     g_ui[1].edit_text("Cooldown", "start")
 }
 

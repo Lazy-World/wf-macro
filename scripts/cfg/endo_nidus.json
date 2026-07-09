@@ -2,7 +2,7 @@
     "$version": 1,
     "hk": {
         "StartStop": {
-            "key": "XButton2",
+            "key": "2",
             "description": "Endo nidus cast sequence",
             "tooltip": "Two-stage skill cast"
         }

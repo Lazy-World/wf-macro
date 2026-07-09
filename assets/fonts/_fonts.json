@@ -1,0 +1,11 @@
+{
+    "fonts": [
+        { "file": "Helvetica.ttf", "face": "Helvetica" },
+        { "file": "JetBrainsMono-Medium.ttf", "face": "JetBrains Mono Medium" },
+        { "file": "Montserrat-Medium.otf", "face": "Montserrat Medium" },
+        { "file": "YsabeauSC-Bold.ttf", "face": "Ysabeau SC Bold" },
+        { "file": "bullet.ttf", "face": "bullet" },
+        { "file": "menu_font.ttf", "face": "menu_font" },
+        { "file": "smalle.fon", "face": "Small Fonts", "skip": true }
+    ]
+}

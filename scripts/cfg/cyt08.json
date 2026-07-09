@@ -3,30 +3,17 @@
     "hk": {
         "StartStop": {
             "key": "XButton2",
-            "description": "Cyt08 cast sequence",
-            "tooltip": "Two-stage skill cast"
+            "description": "Cyt08 cast sequence"
         }
     },
     "val": {
         "skillKey": {
             "val": "2",
-            "description": "Ability slot key",
-            "tooltip": "Number key of ability to cast"
+            "description": "Ability slot key"
         },
-        "preDelay": {
-            "val": 1000,
-            "description": "Pre-cast delay (ms)",
-            "tooltip": "Delay after first cast"
-        },
-        "midDelay": {
-            "val": 1000,
-            "description": "Mid delay (ms)",
-            "tooltip": "Delay before second cast"
-        },
-        "postDelay": {
-            "val": 400,
-            "description": "Post-cast delay (ms)",
-            "tooltip": "Delay after second cast"
+        "SpamTime": {
+            "val": "800",
+            "description": "Ability spam delay"
         }
     }
 }

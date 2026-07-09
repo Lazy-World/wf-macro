@@ -9,6 +9,12 @@ GetQPC() {
     return v
 }
 
+TimeStamp() {
+    static StampName := 0
+    DllCall("QueryPerformanceCounter", "Int64*", &StampName)
+    return StampName
+}
+
 lSleep(s_time, start := 0) {
     global Frequency
 

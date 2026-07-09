@@ -23,6 +23,7 @@ for fn, combo in g_macro.Hotkeys()
 ;;                 GUI                 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 global g_ui := []
+g_delay := 750
 
 gGuiW := 80
 gGuiH := 28
@@ -44,18 +45,12 @@ StartStop(*) {
     postDelay := g_macro.V("postDelay")
     toggleKey := g_macro.K("StartStop")
 
-    g_ui[1].edit_text("Cooldown", "GO: 1")
+    g_ui[1].edit_text("Cooldown", g_delay)
+
     SendInput "{Blind}{" skillKey "}"
-    lSleep(preDelay)
+    lSleep(g_delay)
+    SendInput "{Blind}{" skillKey "}"
 
-    while GetKeyState(toggleKey, "p") {
-        lSleep(midDelay)
-        g_ui[1].edit_text("Cooldown", "GO: 2")
-
-        SendInput "{Blind}{" skillKey "}"
-        lSleep(postDelay)
-        break
-    }
 
     g_ui[1].edit_text("Cooldown", "start")
 }
