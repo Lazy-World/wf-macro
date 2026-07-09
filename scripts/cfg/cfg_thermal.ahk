@@ -11,3 +11,7 @@ MiscReloadMacroKey = Insert ; Reload macros
 ; @Tooltip Выключить макрос
 ; @Bind
 MiscUnloadMacroKey = Del ; Unload macros
+
+; @Tooltip Пауза / возобновление макроса
+; @Bind
+MiscPauseKey = F11 ; Pause / resume macros

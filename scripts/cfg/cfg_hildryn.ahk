@@ -12,5 +12,9 @@ MiscReloadMacroKey = Insert ; Reload macros
 ; @Bind
 MiscUnloadMacroKey = Del ; Unload macros
 
+; @Tooltip Пауза / возобновление макроса
+; @Bind
+MiscPauseKey = F11 ; Pause / resume macros
+
 Abil_2_Cooldown := 3500
 Alt_fire_Cooldown := 1000

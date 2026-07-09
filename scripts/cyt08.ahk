@@ -1,8 +1,5 @@
 #include %A_ScriptDir%/..
 
-global ui_theme := {voidTheme: {winOL: "ADADAD", alpOL: 255, winBG: "151515", alpBG: 180, title: "Montserrat Medium", titleCol: "86C8BC", titleSZ: 13, main: "Montserrat Medium", mainCol: "White", mainSZ: 13, info: "Montserrat Medium", infoCol: "FFF6BD", infoSZ: 13}}
-ui_theme := ui_theme.voidTheme
-
 #include presets\game_settings.ahk
 
 #include lib\headers.ahk
@@ -15,33 +12,28 @@ ui_theme := ui_theme.voidTheme
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include %A_ScriptDir%
 #include cfg\cfg_%A_Scriptname%
+#include misc\ui_theme.ahk
 
 SpamTime := 800
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                Misc                 ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Hotkey, *%MiscReloadMacroKey%, MiscReloadMacro
 Hotkey, *%MiscUnloadMacroKey%, MiscUnloadMacro
+Hotkey, *%MiscPauseKey%, MiscPause
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+#include misc\require_warframe.ahk
 Hotkey, *%StartStopKey%, StartStop
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                 GUI                 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-global ui := []
-
-gGuiW := 80
-gGuiH := 28
-
-gPosX := Ceil(gScreen[1] * 0.008)
-gPosY := Ceil(gScreen[2] * 0.47)
-
-ui.push(new Window("gui_chat", new Vector(gPosX, gPosY), new Vector(gGuiW, gGuiH), ui_theme, {"ol": [1, 1, 1, 1]}))
-ui[1].new_text("Cooldown", "CYTE-09", "title", "auto")
-ui[1].edit_color("Cooldown", "dadada")
-ui[1].show()
-return
+guiLabel := "CYTE-09"
+#include misc\gui.ahk
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Source                ;;
@@ -55,7 +47,7 @@ StartStop:
 
     While ( GetKeyState(StartStopKey, "p") )
     {
-        if (SpamTime < MeasureTime(AbilityStart)) 
+        if (SpamTime < MeasureTime(AbilityStart))
         {
             TimeStamp(AbilityStart)
             SendInput {Blind}{%secondAKey%}
@@ -67,13 +59,4 @@ StartStop:
     ui[1].edit_text("Cooldown", "CYTE-09")
 Return
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                Misc                 ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-MiscReloadMacro:
-    reload
-return
-
-MiscUnloadMacro:
-    exitapp
-return
+#include misc\misc.ahk
