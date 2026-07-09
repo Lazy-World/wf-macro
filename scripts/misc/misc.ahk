@@ -14,9 +14,9 @@ return
 MiscPause:
     Suspend, Toggle
     if (A_IsSuspended) {
-        pausedBody := ui[1].text().get_control("Cooldown")["body"]
-        ui[1].edit_text("Cooldown", "PAUSE")
+        pausedBody := status.text
+        status.text := "PAUSE"
     } else {
-        ui[1].edit_text("Cooldown", pausedBody)
+        status.text := pausedBody
     }
 return

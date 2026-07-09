@@ -39,7 +39,7 @@ guiLabel := "PT"
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 StartStop:
-	ui[1].edit_text("Cooldown", "PEPE")
+	status.text := "PEPE"
 
 	While GetKeyState(StartStopKey, "p"){
 		SendInput {Blind}{%shootKey% Down}
@@ -50,7 +50,7 @@ StartStop:
 		gosub ZawThrow
 	}
 
-	ui[1].edit_text("Cooldown", "PT")
+	status.text := "PT"
 return
 
 ZawThrow:

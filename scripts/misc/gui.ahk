@@ -1,16 +1,6 @@
-;; Shared "Cooldown" status window.
+;; Shared status window.
 ;; Set the global variable `guiLabel` before including this file.
-;; Exposes the window as ui[1].
-global ui := []
-
-gGuiW := 80
-gGuiH := 28
-
-gPosX := Ceil(gScreen[1] * 0.008)
-gPosY := Ceil(gScreen[2] * 0.47)
-
-ui.push(new Window("gui_chat", new Vector(gPosX, gPosY), new Vector(gGuiW, gGuiH), ui_theme, {"ol": [1, 1, 1, 1]}))
-ui[1].new_text("Cooldown", guiLabel, "title", "auto")
-ui[1].edit_color("Cooldown", "dadada")
-ui[1].show()
+;; Exposes the window as the super-global `status`.
+;; Update the label anywhere with:  status.text := "..."   (read it back with: status.text)
+global status := new StatusWindow(Ceil(gScreen[1] * 0.008), Ceil(gScreen[2] * 0.47), guiLabel)
 return

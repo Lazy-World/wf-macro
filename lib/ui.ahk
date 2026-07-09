@@ -927,3 +927,113 @@ class Ui {
             window_obj.__delete()
     }
 }
+
+;; StatusWindow — task-focused facade over Window for the common case:
+;; a small status window with a text label you read/write via `.text`.
+;;   status := new StatusWindow(x, y, "HILDR")   ; build + show, theme = global ui_theme
+;;   status.text := "GO"                         ; write the label
+;;   cur := status.text                          ; read the label
+;; opt overrides defaults {w:80, h:28, style:"title", color:"dadada",
+;; align:"center", outline:true, name:auto, theme:ui_theme}. opt.config is a
+;; raw Window Config merged over the friendly keys (blur/picture/etc).
+class StatusWindow {
+    static _n := 0
+
+    __new(x, y, label := "", opt := "") {
+        global ui_theme
+        theme := NonNull_Ret(opt.theme, ui_theme)
+
+        this._primary := "main"
+        this.win := new Window(NonNull_Ret(opt.name, "status" (++StatusWindow._n))
+            , new Vector(x, y)
+            , new Vector(NonNull_Ret(opt.w, 80), NonNull_Ret(opt.h, 28))
+            , theme, this._config(opt))
+
+        this.win.new_text(this._primary, label, NonNull_Ret(opt.style, "title"), NonNull_Ret(opt.align, "auto"))
+        this.win.edit_color(this._primary, NonNull_Ret(opt.color, "dadada"))
+        this.win.show()
+    }
+
+    _config(opt) {
+        ol := NonNull_Ret(opt.outline, true)
+        cfg := {}
+        cfg.ol := IsObject(ol) ? ol : (ol = "corner" ? "corner" : (ol ? [1, 1, 1, 1] : [0, 0, 0, 0]))
+
+        if IsObject(opt.config)
+            for k, v in opt.config
+                cfg[k] := v
+
+        return cfg
+    }
+
+    text {
+        get {
+            return this.win.text().get_control(this._primary)["body"]
+        }
+        set {
+            this.win.edit_text(this._primary, value)
+            return value
+        }
+    }
+
+    color(hex) {
+        this.win.edit_color(this._primary, hex)
+        return this
+    }
+
+    label(name, params*) {
+        if (params.Length() == 0)
+            return this.win.text().get_control(name)["body"]
+        this.win.edit_text(name, params[1])
+        return this
+    }
+
+    add(name, text, opt := "") {
+        this.win.new_text(name, text, NonNull_Ret(opt.style, "info"), NonNull_Ret(opt.align, "auto"))
+        if (opt.color != "")
+            this.win.edit_color(name, opt.color)
+        this.win.show()
+        return this
+    }
+
+    move_to(x, y) {
+        this.win.new_pos(x, y)
+        return this
+    }
+    move_by(dx, dy) {
+        this.win.move(dx, dy)
+        return this
+    }
+    resize_to(w, h) {
+        this.win.new_size(w, h)
+        return this
+    }
+    resize_by(dw, dh) {
+        this.win.resize(dw, dh)
+        return this
+    }
+
+    add_slider(name, x, y, w, h, min, max, val, opt := "") {
+        this.win.new_slider(name, new Vector(x, y), new Vector(w, h), min, max, val, opt)
+        this.win.show()
+        return this
+    }
+    slider(name) {
+        return this.win.slider(name)
+    }
+
+    show() {
+        this.win.show()
+        return this
+    }
+    hide() {
+        this.win.hide()
+        return this
+    }
+    hwnd() {
+        return this.win.hwnd()
+    }
+    window() {
+        return this.win
+    }
+}

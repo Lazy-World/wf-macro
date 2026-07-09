@@ -37,7 +37,7 @@ guiLabel := "MELEE"
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 StartStop:
-    ui[1].edit_text("Cooldown", "+W")
+    status.text := "+W"
 
 	SendInput {Blind}{%meleeKey% Down}
 
@@ -50,7 +50,7 @@ StartStop:
 
 	SendInput {Blind}{%meleeKey% Up}
 
-    ui[1].edit_text("Cooldown", "MELEE")
+    status.text := "MELEE"
 Return
 
 #include misc\misc.ahk

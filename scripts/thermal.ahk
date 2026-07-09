@@ -39,7 +39,7 @@ guiLabel := skillKey
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 StartStop:
-    ui[1].edit_text("Cooldown", "GO")
+    status.text := "GO"
 
     While GetKeyState(ThermalKey, "p"){
         SendInput {Blind}{%skillKey%}
@@ -49,7 +49,7 @@ StartStop:
         lSleep(500)
     }
 
-    ui[1].edit_text("Cooldown", skillKey)
+    status.text := skillKey
 Return
 
 #include misc\misc.ahk

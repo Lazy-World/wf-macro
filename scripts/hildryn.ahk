@@ -37,7 +37,7 @@ guiLabel := "HILDR"
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 StartStop:
-    ui[1].edit_text("Cooldown", "GAGA")
+    status.text := "GAGA"
     Send, {Blind}{%secondAKey%}
     Send, {Blind}{%shoot2Key%}
 
@@ -51,7 +51,7 @@ StartStop:
     SetTimer, AbilitySpam, off
     SetTimer, AltFireSpam, off
 
-    ui[1].edit_text("Cooldown", "HILDR")
+    status.text := "HILDR"
 Return
 
 AbilitySpam:

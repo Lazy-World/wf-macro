@@ -37,7 +37,7 @@ guiLabel := "ZAW"
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 StartStop:
-    ui[1].edit_text("Cooldown", "GO")
+    status.text := "GO"
 
     SendInput {Blind}{%jumpKey%}
 	lSleep(25)
@@ -50,7 +50,7 @@ StartStop:
 	SendInput {Blind}{%aimKey% Up}
 	lSleep(500)
 
-    ui[1].edit_text("Cooldown", "ZAW")
+    status.text := "ZAW"
 Return
 
 #include misc\misc.ahk

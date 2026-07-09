@@ -39,7 +39,7 @@ guiLabel := "CYTE-09"
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 StartStop:
-    ui[1].edit_text("Cooldown", SpamTime)
+    status.text := SpamTime
     TimeStamp(AbilityStart)
 
     Send, {Blind}{%secondAKey%}
@@ -56,7 +56,7 @@ StartStop:
     }
 
     Send, {Blind}{%shootKey% Up}
-    ui[1].edit_text("Cooldown", "CYTE-09")
+    status.text := "CYTE-09"
 Return
 
 #include misc\misc.ahk
