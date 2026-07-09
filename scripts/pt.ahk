@@ -6,7 +6,7 @@ ui_theme := ui_theme.voidTheme
 #include presets\game_settings.ahk
 
 #include lib\headers.ahk
-#include lib\custom_ui.ahk
+#include lib\ui.ahk
 #include lib\timers.ahk
 #include lib\utils.ahk
 
@@ -37,8 +37,9 @@ gGuiH := 28
 gPosX := Ceil(gScreen[1] * 0.008)
 gPosY := Ceil(gScreen[2] * 0.47)
 
-ui.push(new Window("gui_chat", gPosX, gPosY, gGuiW, gGuiH, ui_theme, 3.132))
-ui[1].new_text("Cooldown", "PT", "auto", "title", "dadada")
+ui.push(new Window("gui_chat", new Vector(gPosX, gPosY), new Vector(gGuiW, gGuiH), ui_theme, {"ol": [1, 1, 1, 1]}))
+ui[1].new_text("Cooldown", "PT", "title", "auto")
+ui[1].edit_color("Cooldown", "dadada")
 ui[1].show()
 return
 
