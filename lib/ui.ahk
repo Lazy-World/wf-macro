@@ -1,7 +1,13 @@
 ﻿DllCall("SetThreadDpiAwarenessContext", "ptr", -3, "ptr")
 
 NonNull_Ret(var, DefaultValue, MinValue:="", MaxValue:="") {
-	return, var="" ? DefaultValue : MinValue="" ? (MaxValue="" ? var : Min(var, MaxValue)) : (MaxValue!="" ? Max(Min(var, MaxValue), MinValue) : Max(var, MinValue))
+	if (var = "")
+		return DefaultValue
+	if (MaxValue != "")
+		var := Min(var, MaxValue)
+	if (MinValue != "")
+		var := Max(var, MinValue)
+	return var
 }
 
 ArraysEqual(arr1, arr2) {
@@ -14,6 +20,23 @@ ArraysEqual(arr1, arr2) {
         } else if (val != arr2[idx])
             return false
     return true
+}
+
+GuiBaseStyle() {
+	return "+AlwaysOnTop -Caption +LastFound -SysMenu +ToolWindow -DPIScale +E0x20"
+}
+
+EdgeOutlineLayout(vec_pos, vec_size, bold, ol_r, ol_l, border) {
+	border2 := border * 2
+	ol_sum := ol_r + ol_l
+	ol_cond := border * (2 - ol_sum)
+	size_w := vec_size.x
+	size_h := vec_size.y
+
+	return [   [vec_pos.add(-bold, -border), new Vector(bold, size_h + border2)] ; right
+	         , [vec_pos.add(-bold + (ol_r ? 0 : bold - border), -bold), new Vector(size_w + bold * ol_sum + ol_cond, bold)] ; top
+	         , [vec_pos.add(size_w, -border), new Vector(bold, size_h + border2)] ; left
+	         , [vec_pos.add(-bold + (ol_r ? 0 : bold - border), size_h), new Vector(size_w + bold * ol_sum + ol_cond, bold)]] ; bottom
 }
 
 class Vector {
@@ -54,9 +77,9 @@ class Text {
 
         this.mtl            := NonNull_Ret(Config.margin        , 2) ; margin from top left
 
-        this.mbr := this.mtl + this.mtl ; margin bottom right
+        this.mbr := this.mtl * 2 ; margin bottom right
 
-        Gui % this.name ": +AlwaysOnTop -Caption +LastFound -SysMenu +ToolWindow -DPIScale +E0x20 +Hwnd"myHwnd
+        Gui % this.name ": " GuiBaseStyle() " +Hwnd"myHwnd
         Gui % this.name ": Margin", 0, 0
         Gui % this.name ": Color", 0x000000
         Winset, Transcolor, 0x000000  
@@ -111,6 +134,21 @@ class Text {
     get_control(name) {
         return this.controls[name]
     }
+
+    _apply_fit() {
+        for name in this.controls
+        {
+            fitList := ""
+
+            if (this.controls[name]["fit_x"] != 0)
+                fitList .= " w" this.size.x-this.mbr
+
+            if (this.controls[name]["fit_y"] != 0)
+                fitList .= " h" this.size.y-this.mbr
+
+            GuiControl % this.name ": Move", % this.controls[name]["control"], % fitList
+        }
+    }
  
     measure(control_name) {
         textBody := this.controls[control_name]["body"]
@@ -157,11 +195,8 @@ class Text {
     }
     
     move(params*) {
-        if (params.Length() == 1) {
-            this.pos := this.pos.add(params[1])
-        } else if (params.Length() == 2) { 
-            this.pos := this.pos.add(new Vector(params[1], params[2]))
-        }
+        if (params.Length() >= 1 && params.Length() <= 2)
+            this.pos := this.pos.add(params*)
 
         this.show()
     }
@@ -174,42 +209,17 @@ class Text {
             this.size.y := params[2]
         }
 
-        for name in this.controls
-        {
-            fitList := ""
+        this._apply_fit()
 
-            if (this.controls[name]["fit_x"] != 0)
-                fitList .= " w" this.size.x-this.mbr
-    
-            if (this.controls[name]["fit_y"] != 0)
-                fitList .= " h" this.size.y-this.mbr
-
-            GuiControl % this.name ": Move", % this.controls[name]["control"], % fitList
-        }
-    
         this.show()
     }
-    
+
     resize(params*) {
-        if (params.Length() == 1) {
-            this.size := this.size.add(params[1])
-        } else if (params.Length() == 2) { 
-            this.size := this.size.add(new Vector(params[1], params[2]))
-        }
+        if (params.Length() >= 1 && params.Length() <= 2)
+            this.size := this.size.add(params*)
     
-        for name in this.controls
-        {
-            fitList := ""
+        this._apply_fit()
 
-            if (this.controls[name]["fit_x"] != 0)
-                fitList .= " w" this.size.x-this.mbr
-    
-            if (this.controls[name]["fit_y"] != 0)
-                fitList .= " h" this.size.y-this.mbr
-
-            GuiControl % this.name ": Move", % this.controls[name]["control"], % fitList
-        }    
-    
         this.show()
     }
 
@@ -239,7 +249,7 @@ class Picture {
         this.add_y          := NonNull_Ret(Config.y             , 0)
 
         myHwnd := this.name
-        titleString := "+AlwaysOnTop -Caption +LastFound -SysMenu +ToolWindow -DPIScale +E0x20"
+        titleString := GuiBaseStyle()
 
         Gui % this.name ": " titleString " +Hwnd"myHwnd
         Gui % this.name ": Margin", 0, 0
@@ -264,6 +274,10 @@ class Picture {
         Gui % this.name ": Hide"
     }
 
+    get_hwnd() {
+        return this.hwnd
+    }
+
     __delete() {
         Gui % this.name ": Destroy"
     }
@@ -283,7 +297,7 @@ class Line {
         this.noBG           := NonNull_Ret(Config.no_bg         , 0)
 
         myHwnd := this.name
-        titleString := "+AlwaysOnTop -Caption +LastFound -SysMenu +ToolWindow -DPIScale +E0x20"
+        titleString := GuiBaseStyle()
 
         if this.border
             titleString := titleString . " +Border"
@@ -312,11 +326,8 @@ class Line {
     }
     
     move(params*) {
-        if (params.Length() == 1) {
-            this.pos := this.pos.add(params[1])
-        } else if (params.Length() == 2) { 
-            this.pos := this.pos.add(new Vector(params[1], params[2]))
-        }
+        if (params.Length() >= 1 && params.Length() <= 2)
+            this.pos := this.pos.add(params*)
 
         this.show()
     }
@@ -333,11 +344,8 @@ class Line {
     }
 
     resize(params*) {
-        if (params.Length() == 1) {
-            this.size := this.size.add(params[1])
-        } else if (params.Length() == 2) { 
-            this.size := this.size.add(new Vector(params[1], params[2]))
-        }
+        if (params.Length() >= 1 && params.Length() <= 2)
+            this.size := this.size.add(params*)
 
         this.show()
     }
@@ -409,12 +417,16 @@ class Slider {
         this.max := max
         this.val := ceil((val - min) / (max - min) * 100)
 
-        for i, val in this.outline
+        this.has_outline := false
+        for i, val in this.outline {
             this.outline[i] := ceil(abs(this.outline[i])) != 0 ? 1 : 0
+            if (this.outline[i])
+                this.has_outline := true
+        }
         this.border := ceil(abs(this.border)) != 0 ? 1 : 0
 
         myHwnd := this.name
-        titleString := "+AlwaysOnTop -Caption +LastFound -SysMenu +ToolWindow -DPIScale +E0x20"
+        titleString := GuiBaseStyle()
 
         if this.border
             titleString := titleString . " +Border"
@@ -487,7 +499,7 @@ class Slider {
     }
 
     new_pos(new_pos) {
-        if !ArraysEqual(this.outline, [0, 0, 0, 0])
+        if this.has_outline
         {
             this.outline_elements := []
             this._draw_outline(new_pos, this.size) ; Brain rot
@@ -498,25 +510,25 @@ class Slider {
     }
 
     move(add_pos*) {
-        if !ArraysEqual(this.outline, [0, 0, 0, 0])
+        if this.has_outline
             for i, element in this.outline_elements
                 element.move(add_pos*)
 
         if (add_pos.Length() == 1) {
             this.pos := this.pos.add(add_pos[1])
         } else if (add_pos.Length() == 2) { 
-            this.pos := this.pos.add(new Vector(add_pos[1], add_pos[2]))
+            this.pos := this.pos.add(add_pos[1], add_pos[2])
         }
 
         this.show()
     }
 
     new_size(new_size*) {
-        if !ArraysEqual(this.outline, [0, 0, 0, 0])
+        if this.has_outline
         {
             this.outline_elements := []
             if (new_size.Length() == 1) {
-                this._draw_outline(this.pos, new Vector(new_size.x, this.size.y))
+                this._draw_outline(this.pos, new Vector(new_size[1].x, this.size.y))
             } else if (new_size.Length() ==2) { 
                 this._draw_outline(this.pos, new Vector(new_size[1], this.size.y))
             } 
@@ -526,19 +538,18 @@ class Slider {
             this.size := new Vector(new_size[1].x, this.size.y)
         } else if (new_size.Length() == 2) { 
             this.size.x := new_size[1]
-            this.size.y := this.size.y
         }
 
-        Gui % this.name ": Add", Progress, % " x0 y0 w" this.size.x " h" this.size.y " c" this.color  " Background" this.bgCol " +Hwnd" this.hwnd, % this.val
+        GuiControl % this.name ": Move", % this.hwnd, % "w" this.size.x " h" this.size.y
         this.show()
     }
 
     resize(add_size*) {
-        if !ArraysEqual(this.outline, [0, 0, 0, 0])
+        if this.has_outline
         {
             this.outline_elements := []
             if (add_size.Length() == 1) {
-                this._draw_outline(this.pos, this.size.add(add_size.x, 0))
+                this._draw_outline(this.pos, this.size.add(add_size[1].x, 0))
             } else if (add_size.Length() == 2) { 
                 this._draw_outline(this.pos, this.size.add(add_size[1], 0))
             }
@@ -550,7 +561,7 @@ class Slider {
             this.size := this.size.add(add_size[1], 0)
         }
 
-        Gui % this.name ": Add", Progress, % " x0 y0 w" this.size.x " h" this.size.y " c" this.color  " Background" this.bgCol " +Hwnd" this.hwnd, % this.val
+        GuiControl % this.name ": Move", % this.hwnd, % "w" this.size.x " h" this.size.y
         this.show()
     }
 
@@ -559,21 +570,8 @@ class Slider {
     }
 
     _draw_outline(vec_pos, vec_size) {
-        ol_r := this.outline[1], ol_l := this.outline[3]
         border := this.border ? 1 : 0
-
-        bold := this.outline_sz
-        size_w := vec_size.x
-        size_h := vec_size.y
-
-        border2 := border * 2
-        ol_sum := ol_r + ol_l
-        ol_cond := (ol_sum = 2 ? 0 : ol_sum = 0 ? border2 : border)
-
-        layout := [   [vec_pos.add(-bold, -border), new Vector(bold, size_h + border2)] ; right
-                    , [vec_pos.add(-bold + (ol_r ? 0 : bold - border), -bold), new Vector(size_w + bold * ol_sum + ol_cond, bold)] ; top
-                    , [vec_pos.add(size_w, -border), new Vector(bold, size_h + border2)] ; left
-                    , [vec_pos.add(-bold + (ol_r ? 0 : bold - border), size_h), new Vector(size_w + bold * ol_sum + ol_cond, bold)]] ; bottom
+        layout := EdgeOutlineLayout(vec_pos, vec_size, this.outline_sz, this.outline[1], this.outline[3], border)
 
         for i, val in this.outline
             if val
@@ -629,9 +627,16 @@ class Window {
         this.outline_sz     := NonNull_Ret(Config.ol_sz         , 2)
         this.outline_len    := NonNull_Ret(Config.ol_len        , ceil(min(vec_size.x, vec_size.y) * 0.22))
 
-        if this.outline != "corner"
-            for i, val in this.outline
+        if (this.outline = "corner")
+            this.has_outline := true
+        else {
+            this.has_outline := false
+            for i, val in this.outline {
                 this.outline[i] := ceil(abs(this.outline[i])) != 0 ? 1 : 0
+                if (this.outline[i])
+                    this.has_outline := true
+            }
+        }
 
         this.border := ceil(abs(this.border)) != 0 ? 1 : 0
         this.outline_len := clamp(this.outline_len, 0, ceil(min(vec_size.x, vec_size.y) * 0.5))
@@ -680,7 +685,7 @@ class Window {
     }
 
     controls() {
-        return this.text_window.get_controls()
+        return this.text_window.controls
     }
 
     hwnd() {
@@ -715,7 +720,7 @@ class Window {
         if this.blur
             this.blur_window.new_pos(new_pos*)
 
-        if !ArraysEqual(this.outline, [0, 0, 0, 0])
+        if this.has_outline
         {
             this.outline_elements := []
 
@@ -736,7 +741,7 @@ class Window {
         if this.blur
             this.blur_window.move(add_pos*)
 
-        if !ArraysEqual(this.outline, [0, 0, 0, 0])
+        if this.has_outline
             for i, element in this.outline_elements
                 element.move(add_pos*)
 
@@ -748,14 +753,14 @@ class Window {
     }
 
     new_size(new_size*) {
-        if !ArraysEqual(this.outline, [0, 0, 0, 0])
+        if this.has_outline
         {
             this.outline_elements := []
             if (new_size.Length() == 1) {
                 if this.outline != "corner"
-                    this._draw_outline(this.window.pos, new_size)
+                    this._draw_outline(this.window.pos, new_size[1])
                 else
-                    this._draw_corner_outline(this.window.pos, new_size)
+                    this._draw_corner_outline(this.window.pos, new_size[1])
             } else if (new_size.Length() == 2) { 
                 if this.outline != "corner"
                     this._draw_outline(this.window.pos, new Vector(new_size[1], new_size[2]))
@@ -786,14 +791,14 @@ class Window {
     }
 
     resize(add_size*) {
-        if !ArraysEqual(this.outline, [0, 0, 0, 0])
+        if this.has_outline
         {
             this.outline_elements := []
             if (add_size.Length() == 1) {
                 if this.outline != "corner"
-                    this._draw_outline(this.window.pos, this.window.size.add(add_size.x, add_size.y))
+                    this._draw_outline(this.window.pos, this.window.size.add(add_size[1].x, add_size[1].y))
                 else
-                    this._draw_corner_outline(this.window.pos, this.window.size.add(add_size.x, add_size.y))
+                    this._draw_corner_outline(this.window.pos, this.window.size.add(add_size[1].x, add_size[1].y))
             } else if (add_size.Length() == 2) {
                 if this.outline != "corner"
                     this._draw_outline(this.window.pos, this.window.size.add(add_size[1], add_size[2]))
@@ -816,21 +821,8 @@ class Window {
     }
 
     _draw_outline(vec_pos, vec_size) {
-        ol_r := this.outline[1], ol_l := this.outline[3]
-        border := this.blur ? this.border  : 0
-        
-        bold := this.outline_sz
-        size_w := vec_size.x
-        size_h := vec_size.y
-        
-        border2 := border * 2
-        ol_sum := ol_r + ol_l
-        ol_cond := (ol_sum = 2 ? 0 : ol_sum = 0 ? border2 : border)
-
-        layout := [   [vec_pos.add(-bold, -border), new Vector(bold, size_h + border2)] ; right
-                    , [vec_pos.add(-bold + (ol_r ? 0 : bold - border), -bold), new Vector(size_w + bold * ol_sum + ol_cond, bold)] ; top
-                    , [vec_pos.add(size_w, -border), new Vector(bold, size_h + border2)] ; left
-                    , [vec_pos.add(-bold + (ol_r ? 0 : bold - border), size_h), new Vector(size_w + bold * ol_sum + ol_cond, bold)]] ; bottom
+        border := this.blur ? this.border : 0
+        layout := EdgeOutlineLayout(vec_pos, vec_size, this.outline_sz, this.outline[1], this.outline[3], border)
 
         for i, val in this.outline
             if val
