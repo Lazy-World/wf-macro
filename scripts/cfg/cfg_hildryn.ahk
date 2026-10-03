@@ -1,6 +1,6 @@
 ﻿; @Tooltip Запускает макрос и начинает спамить в чат
 ; @Bind
-StartStopKey = XButton2 ; Enable chat spam
+StartStopKey = RButton ; Enable chat spam
 
 ; @Title Misc
 
@@ -16,5 +16,4 @@ MiscUnloadMacroKey = Del ; Unload macros
 ; @Bind
 MiscPauseKey = F11 ; Pause / resume macros
 
-Abil_2_Cooldown := 3500
-Alt_fire_Cooldown := 1000
+Abil_2_Cooldown := 5000

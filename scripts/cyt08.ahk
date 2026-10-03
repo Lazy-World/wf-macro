@@ -14,7 +14,7 @@
 #include cfg\cfg_%A_Scriptname%
 #include misc\ui_theme.ahk
 
-SpamTime := 800
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                Misc                 ;;
@@ -27,7 +27,7 @@ Hotkey, *%MiscPauseKey%, MiscPause
 ;;               Hotkeys               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include misc\require_warframe.ahk
-Hotkey, *%StartStopKey%, StartStop
+Hotkey, %StartStopKey%, StartStop
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                 GUI                 ;;
@@ -40,12 +40,11 @@ guiLabel := "CYTE-09"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 StartStop:
     status.text := SpamTime
+    
     TimeStamp(AbilityStart)
-
     Send, {Blind}{%secondAKey%}
-    Send, {Blind}{%shootKey% Down}
 
-    While ( GetKeyState(StartStopKey, "p") )
+    While ( GetKeyState(StartStopKey, "P") )
     {
         if (SpamTime < MeasureTime(AbilityStart))
         {
@@ -55,7 +54,6 @@ StartStop:
         lSleep(50)
     }
 
-    Send, {Blind}{%shootKey% Up}
     status.text := "CYTE-09"
 Return
 

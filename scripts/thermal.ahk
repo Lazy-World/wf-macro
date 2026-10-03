@@ -39,13 +39,13 @@ guiLabel := skillKey
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 StartStop:
-    status.text := "GO"
-
     While GetKeyState(ThermalKey, "p"){
-        SendInput {Blind}{%skillKey%}
+        status.text := "HOLD"
+        HoldKey(skillKey, 500)
         lSleep(500)
 
-        HoldKey(skillKey, 500)
+        status.text := "TAP"
+        SendInput {Blind}{%skillKey%}
         lSleep(500)
     }
 

@@ -13,6 +13,7 @@ return
 
 MiscPause:
     Suspend, Toggle
+    Pause, Toggle, 1
     if (A_IsSuspended) {
         pausedBody := status.text
         status.text := "PAUSE"

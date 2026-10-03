@@ -37,30 +37,23 @@ guiLabel := "HILDR"
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 StartStop:
-    status.text := "GAGA"
-    Send, {Blind}{%secondAKey%}
-    Send, {Blind}{%shoot2Key%}
-
+    status.text := "work"
+    
+    Send, {Blind}{%shoot2Key% Down}
     SetTimer, AbilitySpam, %Abil_2_Cooldown%
-    SetTimer, AltFireSpam, %Alt_fire_Cooldown%
 
     While GetKeyState(StartStopKey, "p") {
         lSleep(50)
     }
 
+    Send, {Blind}{%shoot2Key% Up}
     SetTimer, AbilitySpam, off
-    SetTimer, AltFireSpam, off
 
     status.text := "HILDR"
 Return
 
 AbilitySpam:
     Send, {Blind}{%secondAKey%}
-return
-
-AltFireSpam:
-
-    Send, {Blind}{%shoot2Key%}
 return
 
 #include misc\misc.ahk

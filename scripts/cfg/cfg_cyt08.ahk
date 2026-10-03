@@ -1,6 +1,10 @@
 ﻿; @Tooltip Запускает макрос и начинает спамить в чат
 ; @Bind
-StartStopKey = XButton2 ; Enable chat spam
+StartStopKey = LButton ; Enable chat spam
+
+; @Tooltip Запускает макрос и начинает спамить в чат
+; @Value
+SpamTime := 300
 
 ; @Title Misc
 
