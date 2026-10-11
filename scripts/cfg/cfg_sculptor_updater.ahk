@@ -12,7 +12,7 @@ AbilityKey = 2 ; Disable
 
 ; @Tooltip Запускает макрос и начинает спамить в чат
 ; @Value
-DelayBetweenCasts = 11 ; Delay in seconds
+DelayBetweenCasts = 10 ; Delay in seconds
 
 ; @Title Misc
 
