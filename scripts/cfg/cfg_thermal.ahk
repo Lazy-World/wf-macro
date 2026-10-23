@@ -1,17 +1,17 @@
-﻿; @Tooltip Запускает макрос и начинает спамить в чат
+﻿; @Tooltip Пока клавиша зажата, 3-я способность по очереди удерживается и нажимается
 ; @Bind
-ThermalKey = XButton2 ; Enable 
+ThermalKey = XButton2 ; Ability 3 hold / tap
 
 ; @Title Misc
 
 ; @Tooltip Перезагрузка макроса
 ; @Bind
-MiscReloadMacroKey = Insert ; Reload macros
+MiscReloadMacroKey = Insert ; Reload macro
 
 ; @Tooltip Выключить макрос
 ; @Bind
-MiscUnloadMacroKey = Del ; Unload macros
+MiscUnloadMacroKey = Del ; Unload macro
 
 ; @Tooltip Пауза / возобновление макроса
 ; @Bind
-MiscPauseKey = F11 ; Pause / resume macros
+MiscPauseKey = F11 ; Pause / resume macro

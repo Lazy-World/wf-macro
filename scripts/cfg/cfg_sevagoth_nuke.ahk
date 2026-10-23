@@ -1,21 +1,21 @@
-﻿; @Tooltip Запускает макрос и начинает спамить в чат
+﻿; @Tooltip Применяет 2-ю, затем 1-ю способность
 ; @Bind
-StartStopKey = 1 ; Enable chat spam
+NukeKey = 1 ; Ability 2 + 1 combo
 
-; @Tooltip Запускает макрос и начинает спамить в чат
+; @Tooltip Задержка после каждого применения способности (в миллисекундах)
 ; @Value
-DelayBetweenCasts = 300 ; Enable chat spam
+DelayBetweenCasts = 300 ; Delay between casts, ms
 
 ; @Title Misc
 
 ; @Tooltip Перезагрузка макроса
 ; @Bind
-MiscReloadMacroKey = Insert ; Reload macros
+MiscReloadMacroKey = Insert ; Reload macro
 
 ; @Tooltip Выключить макрос
 ; @Bind
-MiscUnloadMacroKey = Del ; Unload macros
+MiscUnloadMacroKey = Del ; Unload macro
 
 ; @Tooltip Пауза / возобновление макроса
 ; @Bind
-MiscPauseKey = F11 ; Pause / resume macros
+MiscPauseKey = F11 ; Pause / resume macro

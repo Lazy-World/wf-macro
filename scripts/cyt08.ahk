@@ -39,14 +39,14 @@ guiLabel := "CYTE-09"
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 StartStop:
-    status.text := SpamTime
+    status.text := AbilityInterval
     
     TimeStamp(AbilityStart)
     Send, {Blind}{%secondAKey%}
 
     While ( GetKeyState(StartStopKey, "P") )
     {
-        if (SpamTime < MeasureTime(AbilityStart))
+        if (AbilityInterval < MeasureTime(AbilityStart))
         {
             TimeStamp(AbilityStart)
             SendInput {Blind}{%secondAKey%}

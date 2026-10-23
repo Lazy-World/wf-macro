@@ -1,29 +1,29 @@
-; @Tooltip Запускает макрос и начинает спамить в чат
+; @Tooltip Запускает периодическое применение способности
 ; @Bind
-StartKey = PgUp ; Enable
+StartKey = PgUp ; Start auto-cast
 
-; @Tooltip Запускает макрос и начинает спамить в чат
+; @Tooltip Останавливает периодическое применение способности
 ; @Bind
-StopKey = PgDn ; Disable
+StopKey = PgDn ; Stop auto-cast
 
-; @Tooltip Запускает макрос и начинает спамить в чат
+; @Tooltip Клавиша способности, которая применяется по таймеру
 ; @Bind
-AbilityKey = 2 ; Disable
+AbilityKey = 2 ; Ability key
 
-; @Tooltip Запускает макрос и начинает спамить в чат
+; @Tooltip Пауза между применениями способности (в секундах)
 ; @Value
-DelayBetweenCasts = 10 ; Delay in seconds
+DelayBetweenCasts = 10 ; Delay between casts, sec
 
 ; @Title Misc
 
 ; @Tooltip Перезагрузка макроса
 ; @Bind
-MiscReloadMacroKey = Insert ; Reload macros
+MiscReloadMacroKey = Insert ; Reload macro
 
 ; @Tooltip Выключить макрос
 ; @Bind
-MiscUnloadMacroKey = Del ; Unload macros
+MiscUnloadMacroKey = Del ; Unload macro
 
 ; @Tooltip Пауза / возобновление макроса
 ; @Bind
-MiscPauseKey = F11 ; Pause / resume macros
+MiscPauseKey = F11 ; Pause / resume macro

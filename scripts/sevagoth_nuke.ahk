@@ -25,7 +25,7 @@ Hotkey, *%MiscPauseKey%, MiscPause
 ;;               Hotkeys               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include misc\require_warframe.ahk
-Hotkey, %StartStopKey%, StartStop
+Hotkey, %NukeKey%, StartStop
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                 GUI                 ;;

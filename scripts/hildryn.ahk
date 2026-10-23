@@ -40,7 +40,7 @@ StartStop:
     status.text := "work"
     
     Send, {Blind}{%shoot2Key% Down}
-    SetTimer, AbilitySpam, %Abil_2_Cooldown%
+    SetTimer, AbilitySpam, %AbilityInterval%
 
     While GetKeyState(StartStopKey, "p") {
         lSleep(50)

@@ -1,17 +1,17 @@
-﻿; @Tooltip Запускает макрос и начинает спамить в чат
+﻿; @Tooltip Бросок оружия: два прыжка, прицел и удар ближнего боя
 ; @Bind
-ThrowKey = XButton2 ; Enable chat spam
+ThrowKey = XButton2 ; Zaw throw
 
 ; @Title Misc
 
 ; @Tooltip Перезагрузка макроса
 ; @Bind
-MiscReloadMacroKey = Insert ; Reload macros
+MiscReloadMacroKey = Insert ; Reload macro
 
 ; @Tooltip Выключить макрос
 ; @Bind
-MiscUnloadMacroKey = Del ; Unload macros
+MiscUnloadMacroKey = Del ; Unload macro
 
 ; @Tooltip Пауза / возобновление макроса
 ; @Bind
-MiscPauseKey = F11 ; Pause / resume macros
+MiscPauseKey = F11 ; Pause / resume macro
