@@ -4,6 +4,7 @@
 
 #include lib\headers.ahk
 #include lib\ui.ahk
+#include lib\joiner.ahk
 #include lib\timers.ahk
 #include lib\utils.ahk
 
@@ -12,28 +13,17 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include %A_ScriptDir%
 #include cfg\cfg_%A_Scriptname%
-#include misc\ui_theme.ahk
 
 skillKey := 3
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                Misc                 ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Hotkey, *%MiscReloadMacroKey%, MiscReloadMacro
-Hotkey, *%MiscUnloadMacroKey%, MiscUnloadMacro
-Hotkey, *%MiscPauseKey%, MiscPause
+guiLabel := skillKey
+#include misc\macro.ahk
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-#include misc\require_warframe.ahk
 Hotkey, *%ThermalKey%, StartStop
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                 GUI                 ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-guiLabel := skillKey
-#include misc\gui.ahk
+return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Source                ;;
@@ -49,7 +39,7 @@ StartStop:
         lSleep(500)
     }
 
-    status.text := skillKey
+    status.reset()
 Return
 
 #include misc\misc.ahk

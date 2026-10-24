@@ -1,23 +1,19 @@
 ;; Shared Misc subroutines: reload / unload / pause.
 ;; Include at the very END of a script (after all its own labels).
-;; reload / exitapp / Suspend are auto-exempt from Suspend, so these
-;; hotkeys keep working while the macro is paused.
+;; Each one acts on every running macro at once (see lib\joiner.ahk).
+;; `Suspend, Permit` keeps these hotkeys working while the macros are paused.
 
 MiscReloadMacro:
-    reload
+    Suspend, Permit
+    Joiner.reload()
 return
 
 MiscUnloadMacro:
-    exitapp
+    Suspend, Permit
+    Joiner.exit()
 return
 
 MiscPause:
-    Suspend, Toggle
-    Pause, Toggle, 1
-    if (A_IsSuspended) {
-        pausedBody := status.text
-        status.text := "PAUSE"
-    } else {
-        status.text := pausedBody
-    }
+    Suspend, Permit
+    Joiner.pause(!Joiner.paused)
 return

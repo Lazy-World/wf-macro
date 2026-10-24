@@ -4,6 +4,7 @@
 
 #include lib\headers.ahk
 #include lib\ui.ahk
+#include lib\joiner.ahk
 #include lib\timers.ahk
 #include lib\utils.ahk
 
@@ -12,26 +13,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include %A_ScriptDir%
 #include cfg\cfg_%A_Scriptname%
-#include misc\ui_theme.ahk
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                Misc                 ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Hotkey, *%MiscReloadMacroKey%, MiscReloadMacro
-Hotkey, *%MiscUnloadMacroKey%, MiscUnloadMacro
-Hotkey, *%MiscPauseKey%, MiscPause
+guiLabel := "ZAW"
+#include misc\macro.ahk
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-#include misc\require_warframe.ahk
 Hotkey, *%ThrowKey%, StartStop
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                 GUI                 ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-guiLabel := "ZAW"
-#include misc\gui.ahk
+return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Source                ;;
@@ -50,7 +40,7 @@ StartStop:
 	SendInput {Blind}{%aimKey% Up}
 	lSleep(500)
 
-    status.text := "ZAW"
+    status.reset()
 Return
 
 #include misc\misc.ahk

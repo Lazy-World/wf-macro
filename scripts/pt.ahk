@@ -4,6 +4,7 @@
 
 #include lib\headers.ahk
 #include lib\ui.ahk
+#include lib\joiner.ahk
 #include lib\timers.ahk
 #include lib\utils.ahk
 
@@ -12,28 +13,17 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include %A_ScriptDir%
 #include cfg\cfg_%A_Scriptname%
-#include misc\ui_theme.ahk
 
 global sleepTime := 2000/fps
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                Misc                 ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Hotkey, *%MiscReloadMacroKey%, MiscReloadMacro
-Hotkey, *%MiscUnloadMacroKey%, MiscUnloadMacro
-Hotkey, *%MiscPauseKey%, MiscPause
+guiLabel := "PT"
+#include misc\macro.ahk
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-#include misc\require_warframe.ahk
 Hotkey, *%StartStopKey%, StartStop
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                 GUI                 ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-guiLabel := "PT"
-#include misc\gui.ahk
+return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Source                ;;
@@ -50,7 +40,7 @@ StartStop:
 		gosub ZawThrow
 	}
 
-	status.text := "PT"
+	status.reset()
 return
 
 ZawThrow:

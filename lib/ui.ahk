@@ -623,20 +623,10 @@ class Window {
 
         this.outline_cl     := NonNull_Ret(Config.ol_col        , this.theme.winOL)
         this.outline_al     := NonNull_Ret(Config.ol_alp        , this.theme.alpOL)
-        this.outline        := NonNull_Ret(Config.ol            , [0, 0, 0, 0])
         this.outline_sz     := NonNull_Ret(Config.ol_sz         , 2)
         this.outline_len    := NonNull_Ret(Config.ol_len        , ceil(min(vec_size.x, vec_size.y) * 0.22))
 
-        if (this.outline = "corner")
-            this.has_outline := true
-        else {
-            this.has_outline := false
-            for i, val in this.outline {
-                this.outline[i] := ceil(abs(this.outline[i])) != 0 ? 1 : 0
-                if (this.outline[i])
-                    this.has_outline := true
-            }
-        }
+        this._set_outline_spec(NonNull_Ret(Config.ol, [0, 0, 0, 0]))
 
         this.border := ceil(abs(this.border)) != 0 ? 1 : 0
         this.outline_len := clamp(this.outline_len, 0, ceil(min(vec_size.x, vec_size.y) * 0.5))
@@ -720,21 +710,10 @@ class Window {
         if this.blur
             this.blur_window.new_pos(new_pos*)
 
-        if this.has_outline
-        {
-            this.outline_elements := []
-
-            if this.outline != "corner"
-                this._draw_outline(this.window.pos, this.window.size)
-            else 
-                this._draw_corner_outline(this.window.pos, this.window.size)
-
-            for idx, element in this.outline_elements
-                element.show()
-        }
-
         this.window.new_pos(new_pos*)
         this.text_window.new_pos(new_pos*)
+
+        this._redraw_outline()
     }
 
     move(add_pos*) {
@@ -753,30 +732,13 @@ class Window {
     }
 
     new_size(new_size*) {
-        if this.has_outline
-        {
-            this.outline_elements := []
-            if (new_size.Length() == 1) {
-                if this.outline != "corner"
-                    this._draw_outline(this.window.pos, new_size[1])
-                else
-                    this._draw_corner_outline(this.window.pos, new_size[1])
-            } else if (new_size.Length() == 2) { 
-                if this.outline != "corner"
-                    this._draw_outline(this.window.pos, new Vector(new_size[1], new_size[2]))
-                else
-                    this._draw_corner_outline(this.window.pos, new Vector(new_size[1], new_size[2]))
-            }
-
-            for idx, element in this.outline_elements
-                element.show()
-        }
-
         if this.blur
             this.blur_window.new_size(new_size*)
 
         this.window.new_size(new_size*)
         this.text_window.new_size(new_size*)
+
+        this._redraw_outline()
 
         for idx, element in this.sliders
         {
@@ -791,33 +753,55 @@ class Window {
     }
 
     resize(add_size*) {
-        if this.has_outline
-        {
-            this.outline_elements := []
-            if (add_size.Length() == 1) {
-                if this.outline != "corner"
-                    this._draw_outline(this.window.pos, this.window.size.add(add_size[1].x, add_size[1].y))
-                else
-                    this._draw_corner_outline(this.window.pos, this.window.size.add(add_size[1].x, add_size[1].y))
-            } else if (add_size.Length() == 2) {
-                if this.outline != "corner"
-                    this._draw_outline(this.window.pos, this.window.size.add(add_size[1], add_size[2]))
-                else
-                    this._draw_corner_outline(this.window.pos, this.window.size.add(add_size[1], add_size[2]))
-            }
-
-            for idx, element in this.outline_elements
-                element.show()
-        }
-
         if this.blur
             this.blur_window.resize(add_size*)
 
         this.window.resize(add_size*)
         this.text_window.resize(add_size*)
 
+        this._redraw_outline()
+
         for idx, element in this.sliders
             element.resize(add_size*)
+    }
+
+    ; ol: [left, top, right, bottom] flags or "corner"
+    set_outline(ol) {
+        this.outline_elements := []
+        this._set_outline_spec(ol)
+        this._redraw_outline()
+    }
+
+    _set_outline_spec(ol) {
+        this.outline := ol
+
+        if (ol = "corner") {
+            this.has_outline := true
+            return
+        }
+
+        this.has_outline := false
+        for i, val in this.outline {
+            this.outline[i] := ceil(abs(val)) != 0 ? 1 : 0
+            if (this.outline[i])
+                this.has_outline := true
+        }
+    }
+
+    ; Rebuilds the outline around the window's current position and size
+    _redraw_outline() {
+        if !this.has_outline
+            return
+
+        this.outline_elements := []
+
+        if this.outline != "corner"
+            this._draw_outline(this.window.pos, this.window.size)
+        else
+            this._draw_corner_outline(this.window.pos, this.window.size)
+
+        for idx, element in this.outline_elements
+            element.show()
     }
 
     _draw_outline(vec_pos, vec_size) {
@@ -928,42 +912,66 @@ class Ui {
     }
 }
 
-;; StatusWindow — task-focused facade over Window for the common case:
-;; a small status window with a text label you read/write via `.text`.
+;; StatusWindow - task-focused facade over Window for the common case:
+;; a header with an icon on top and a body "<label>: <value>" under it.
 ;;   status := new StatusWindow(x, y, "HILDR")   ; build + show, theme = global ui_theme
-;;   status.text := "GO"                         ; write the label
-;;   cur := status.text                          ; read the label
-;; opt overrides defaults {w:80, h:28, style:"title", color:"dadada",
-;; align:"center", outline:true, name:auto, theme:ui_theme}. opt.config is a
-;; raw Window Config merged over the friendly keys (blur/picture/etc).
+;;   status.text := "GO"                         ; body -> "HILDR: GO"
+;;   cur := status.text                          ; read the value
+;;   status.reset()                              ; body -> "HILDR: off"
+;;   status.suspended := true                    ; header -> "suspended"
+;; Several macros stack up via place(slot, last): the header belongs to slot 1,
+;; bodies go below it in slot order with side outlines, the last one is closed
+;; by a bottom outline.
+;; opt overrides defaults {w:120, h:25, head_h:22, gap:4, icon:"D", idle:"off",
+;; style:"accent", color:"", show:true, name:auto, theme:ui_theme}. opt.config is
+;; a raw Window Config merged over the body defaults (blur/picture/etc).
 class StatusWindow {
     static _n := 0
 
     __new(x, y, label := "", opt := "") {
         global ui_theme
         theme := NonNull_Ret(opt.theme, ui_theme)
+        name := NonNull_Ret(opt.name, "status" (++StatusWindow._n))
+        w := NonNull_Ret(opt.w, 120)
 
-        this._primary := "main"
-        this.win := new Window(NonNull_Ret(opt.name, "status" (++StatusWindow._n))
-            , new Vector(x, y)
-            , new Vector(NonNull_Ret(opt.w, 80), NonNull_Ret(opt.h, 28))
-            , theme, this._config(opt))
+        this._x := x
+        this._y := y
+        this._gap := NonNull_Ret(opt.gap, 4)
+        this._head_h := NonNull_Ret(opt.head_h, 22)
+        this._body_h := NonNull_Ret(opt.h, 25)
+        this._icon := NonNull_Ret(opt.icon, "D")
+        this._idle := NonNull_Ret(opt.idle, "off")
+        this._suspended := false
+        this._slot := 0
+        this._last := ""
+        this._primary := "value"
 
-        this.win.new_text(this._primary, label, NonNull_Ret(opt.style, "title"), NonNull_Ret(opt.align, "auto"))
-        this.win.edit_color(this._primary, NonNull_Ret(opt.color, "dadada"))
-        this.win.show()
+        this.head := new Window(name "_head", new Vector(x, y), new Vector(w, this._head_h), theme
+            , {"margin": 2, "blur": 1, "ol": [0, 1, 0, 0]})
+        this.head.new_text("icon", this._icon, "menu_icon", "auto")
+
+        this.win := new Window(name, new Vector(x, this._body_y(1)), new Vector(w, this._body_h), theme, this._config(opt))
+        this.win.new_text("key", label != "" ? label ":" : "", "main", "left x10 ym")
+        this.win.new_text(this._primary, this._idle, NonNull_Ret(opt.style, "accent"), "left x" (10 + this.win.measure("key")[1] + 4) " yp")
+        if (opt.color != "")
+            this.win.edit_color(this._primary, opt.color)
+
+        if NonNull_Ret(opt.show, true)
+            this.place(1)
     }
 
     _config(opt) {
-        ol := NonNull_Ret(opt.outline, true)
-        cfg := {}
-        cfg.ol := IsObject(ol) ? ol : (ol = "corner" ? "corner" : (ol ? [1, 1, 1, 1] : [0, 0, 0, 0]))
+        cfg := {"blur": 1, "ol": [0, 0, 0, 1]}
 
         if IsObject(opt.config)
             for k, v in opt.config
                 cfg[k] := v
 
         return cfg
+    }
+
+    _body_y(slot) {
+        return this._y + this._head_h + this._gap + (slot - 1) * (this._body_h + this._gap)
     }
 
     text {
@@ -974,6 +982,43 @@ class StatusWindow {
             this.win.edit_text(this._primary, value)
             return value
         }
+    }
+
+    suspended {
+        get {
+            return this._suspended
+        }
+        set {
+            this._suspended := value ? true : false
+            this.head.edit_text("icon", this._suspended ? "suspended" : this._icon)
+            return value
+        }
+    }
+
+    reset() {
+        this.text := this._idle
+        return this
+    }
+
+    ; slot 1 = top body (it also shows the header); last closes the stack
+    place(slot, last := true) {
+        last := last ? true : false
+        if (slot = this._slot && last = this._last)
+            return this
+
+        this._slot := slot
+        this._last := last
+
+        this.win.new_pos(this._x, this._body_y(slot))
+        this.win.set_outline(last ? [0, 0, 0, 1] : [1, 0, 1, 0])
+        this.win.show()
+
+        if (slot = 1)
+            this.head.show()
+        else
+            this.head.hide()
+
+        return this
     }
 
     color(hex) {
@@ -996,13 +1041,20 @@ class StatusWindow {
         return this
     }
 
+    ; Moves the whole stack: header and body keep their slot
     move_to(x, y) {
-        this.win.new_pos(x, y)
-        return this
+        this._x := x
+        this._y := y
+        this.head.new_pos(x, y)
+        if (this._slot != 1)
+            this.head.hide()
+
+        slot := Max(this._slot, 1)
+        this._slot := 0
+        return this.place(slot, this._last = "" ? true : this._last)
     }
     move_by(dx, dy) {
-        this.win.move(dx, dy)
-        return this
+        return this.move_to(this._x + dx, this._y + dy)
     }
     resize_to(w, h) {
         this.win.new_size(w, h)
@@ -1024,10 +1076,13 @@ class StatusWindow {
 
     show() {
         this.win.show()
+        if (this._slot <= 1)
+            this.head.show()
         return this
     }
     hide() {
         this.win.hide()
+        this.head.hide()
         return this
     }
     hwnd() {

@@ -4,6 +4,7 @@
 
 #include lib\headers.ahk
 #include lib\ui.ahk
+#include lib\joiner.ahk
 #include lib\timers.ahk
 #include lib\utils.ahk
 
@@ -12,26 +13,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include %A_ScriptDir%
 #include cfg\cfg_%A_Scriptname%
-#include misc\ui_theme.ahk
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                Misc                 ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Hotkey, *%MiscReloadMacroKey%, MiscReloadMacro
-Hotkey, *%MiscUnloadMacroKey%, MiscUnloadMacro
-Hotkey, *%MiscPauseKey%, MiscPause
+guiLabel := "SEVA"
+#include misc\macro.ahk
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-#include misc\require_warframe.ahk
 Hotkey, %NukeKey%, StartStop
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                 GUI                 ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-guiLabel := "SEVA"
-#include misc\gui.ahk
+return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Source                ;;
@@ -45,7 +35,7 @@ StartStop:
     Send, {Blind}{%firstAKey%}
     lSleep(DelayBetweenCasts)
 
-    status.text := "SEVA"
+    status.reset()
 Return
 
 #include misc\misc.ahk

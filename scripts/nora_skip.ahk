@@ -1,9 +1,10 @@
- #include %A_ScriptDir%/..
+#include %A_ScriptDir%/..
 
 #include presets\game_settings.ahk
 
 #include lib\headers.ahk
 #include lib\ui.ahk
+#include lib\joiner.ahk
 #include lib\timers.ahk
 #include lib\utils.ahk
 
@@ -12,26 +13,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include %A_ScriptDir%
 #include cfg\cfg_%A_Scriptname%
-#include misc\ui_theme.ahk
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                Misc                 ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Hotkey, *%MiscReloadMacroKey%, MiscReloadMacro
-Hotkey, *%MiscUnloadMacroKey%, MiscUnloadMacro
-Hotkey, *%MiscPauseKey%, MiscPause
+guiLabel := "X"
+#include misc\macro.ahk
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-#include misc\require_warframe.ahk
 Hotkey, *%SkipKey%, SkipViaNora
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                 GUI                 ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-guiLabel := "X"
-#include misc\gui.ahk
+return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Source                ;;
@@ -57,7 +47,7 @@ SkipViaNora:
     lSleep(150)
     SendInput {Blind}{Esc}
 
-    status.text := "X"
+    status.reset()
 Return
 
 *F1::
@@ -74,7 +64,7 @@ Return
     BlockInput Off
     BlockInput, MouseMoveOff
 
-    status.text := "X"
+    status.reset()
 Return
 
 *F2::
@@ -91,7 +81,7 @@ Return
     BlockInput Off
     BlockInput, MouseMoveOff
 
-    status.text := "X"
+    status.reset()
 Return
 
 #include misc\misc.ahk
