@@ -29,21 +29,21 @@ return
 StartStop:
     status.text := "work"
     
-    Send, {Blind}{%shoot2Key% Down}
+    SendKey(shoot2Key, "Down")
     SetTimer, AbilitySpam, %AbilityInterval%
 
     While GetKeyState(StartStopKey, "p") {
         lSleep(50)
     }
 
-    Send, {Blind}{%shoot2Key% Up}
+    SendKey(shoot2Key, "Up")
     SetTimer, AbilitySpam, off
 
     status.reset()
 Return
 
 AbilitySpam:
-    Send, {Blind}{%secondAKey%}
+    SendKey(secondAKey)
 return
 
 #include misc\misc.ahk

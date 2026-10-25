@@ -43,7 +43,7 @@ Stop:
 return
 
 CastAbility:
-    SendInput, {Blind}{%AbilityKey%}
+    SendKey(AbilityKey)
     nextCastAt := A_TickCount + castInterval
 return
 

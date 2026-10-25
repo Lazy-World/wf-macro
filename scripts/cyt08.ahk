@@ -30,14 +30,14 @@ StartStop:
     status.text := AbilityInterval
     
     TimeStamp(AbilityStart)
-    Send, {Blind}{%secondAKey%}
+    SendKey(secondAKey)
 
     While ( GetKeyState(StartStopKey, "P") )
     {
         if (AbilityInterval < MeasureTime(AbilityStart))
         {
             TimeStamp(AbilityStart)
-            SendInput {Blind}{%secondAKey%}
+            SendKey(secondAKey)
         }
         lSleep(50)
     }

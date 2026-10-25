@@ -29,23 +29,23 @@ return
 SkipViaNora:
     status.text := "skip"
     
-    SendInput {Blind}{Esc}
+    SendKey("Esc")
     lSleep(350)
 
     BlockInput, MouseMove
     ResetCursor()
     MouseMove(Ceil(gScreen[1] * 0.74), Ceil(gScreen[2] * 0.55))
 
-    Send, {vk01 Down}
+    SendKey("vk01", "Down")
     lSleep(200)
-    Send, {vk01 Up}
+    SendKey("vk01", "Up")
     
     BlockInput, MouseMoveOff
     lSleep(300)
 
-    SendInput {Blind}{Esc}
+    SendKey("Esc")
     lSleep(150)
-    SendInput {Blind}{Esc}
+    SendKey("Esc")
 
     status.reset()
 Return
@@ -58,9 +58,9 @@ Return
     BlockInput On
     Send {Click 2133 1269}
 
-    Send, {vk01 Down}
+    SendKey("vk01", "Down")
     lSleep(100)
-    Send, {vk01 Up}
+    SendKey("vk01", "Up")
     BlockInput Off
     BlockInput, MouseMoveOff
 
@@ -75,9 +75,9 @@ Return
     BlockInput On
     Send {Click 2133 1269}
 
-    Send, {vk01 Down}
+    SendKey("vk01", "Down")
     lSleep(100)
-    Send, {vk01 Up}
+    SendKey("vk01", "Up")
     BlockInput Off
     BlockInput, MouseMoveOff
 

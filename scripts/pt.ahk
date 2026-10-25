@@ -32,9 +32,9 @@ StartStop:
 	status.text := "PEPE"
 
 	While GetKeyState(StartStopKey, "p"){
-		SendInput {Blind}{%shootKey% Down}
+		SendKey(shootKey, "Down")
 		lSleep(550)
-		SendInput {Blind}{%shootKey% Up}
+		SendKey(shootKey, "Up")
 
 		lSleep(sleepTime)
 		gosub ZawThrow
@@ -45,15 +45,15 @@ return
 
 ZawThrow:
 	global sleepTime
-    SendInput {Blind}{%jumpKey%}
+    SendKey(jumpKey)
 	lSleep(sleepTime)
-	SendInput {Blind}{%jumpKey%}
+	SendKey(jumpKey)
 	lSleep(sleepTime)
-	SendInput {Blind}{%aimKey% Down}
+	SendKey(aimKey, "Down")
 	lSleep(sleepTime)
-	SendInput {Blind}{%meleeKey%}
+	SendKey(meleeKey)
 	lSleep(sleepTime)
-	SendInput {Blind}{%aimKey% Up}
+	SendKey(aimKey, "Up")
 	lSleep(sleepTime)
 Return
 

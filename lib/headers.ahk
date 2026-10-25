@@ -18,15 +18,18 @@
 #Persistent
 #NoEnv
 #InstallKeybdHook
-SendMode Input
+#KeyHistory 0
+#MaxHotkeysPerInterval 9999999
+#HotkeyInterval 9999999
+#MaxThreads 255
+
+ListLines, Off
 Process, Priority,, A
-ListLines Off
-SetWinDelay, -1
-SetBatchLines, -1
+CoordMode, Pixel, Screen
+SetStoreCapslockMode, Off
+SendMode Input
+SetBatchLines -1
 SetKeyDelay, -1, -1
 SetMouseDelay, -1, -1
-SetControlDelay, -1
-#MaxHotkeysPerInterval 99000000
-#MaxThreads 255
-#KeyHistory 0
-; CoordMode, Mouse, Client
+SetControlDelay -1
+SetWinDelay -1

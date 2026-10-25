@@ -29,16 +29,16 @@ return
 StartStop:
     status.text := "+W"
 
-	SendInput {Blind}{%meleeKey% Down}
+	SendKey(meleeKey, "Down")
 
 	While GetKeyState(StartStopKey, "p"){
-        SendInput {Blind}{%crouchKey% Down}
+        SendKey(crouchKey, "Down")
         lSleep(230)
-		SendInput {Blind}{%crouchKey% Up}
+		SendKey(crouchKey, "Up")
 		lSleep(230)
     }
 
-	SendInput {Blind}{%meleeKey% Up}
+	SendKey(meleeKey, "Up")
 
     status.reset()
 Return

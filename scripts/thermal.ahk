@@ -35,7 +35,7 @@ StartStop:
         lSleep(500)
 
         status.text := "TAP"
-        SendInput {Blind}{%skillKey%}
+        SendKey(skillKey)
         lSleep(500)
     }
 

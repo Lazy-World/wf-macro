@@ -28,11 +28,11 @@ return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 StartStop:
     status.text := ".."
-    Send, {Blind}{%secondAKey%}
+    SendKey(secondAKey)
     lSleep(DelayBetweenCasts)
 
     status.text := "..."
-    Send, {Blind}{%firstAKey%}
+    SendKey(firstAKey)
     lSleep(DelayBetweenCasts)
 
     status.reset()

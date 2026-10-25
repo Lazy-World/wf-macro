@@ -470,12 +470,10 @@ class Slider {
         stepSize := stepSize * 0.94
 
         SetTimer, tmpLabel, % stepSize
-        Critical
-            if start != -1
-                lSleep(this.max - this.min, start)
-            else
-                lSleep(this.max - this.min)
-        Critical, Off
+        if start != -1
+            lSleep(this.max - this.min, start)
+        else
+            lSleep(this.max - this.min)
         SetTimer, tmpLabel, Off
 
         return

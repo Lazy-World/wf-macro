@@ -29,15 +29,15 @@ return
 StartStop:
     status.text := "GO"
 
-    SendInput {Blind}{%jumpKey%}
+    SendKey(jumpKey)
 	lSleep(25)
-	SendInput {Blind}{%jumpKey%}
+	SendKey(jumpKey)
 	lSleep(25)
-	SendInput {Blind}{%aimKey% Down}
+	SendKey(aimKey, "Down")
 	lSleep(25)
-	SendInput {Blind}{%meleeKey%}
+	SendKey(meleeKey)
 	lSleep(25)
-	SendInput {Blind}{%aimKey% Up}
+	SendKey(aimKey, "Up")
 	lSleep(500)
 
     status.reset()
