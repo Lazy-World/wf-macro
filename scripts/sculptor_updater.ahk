@@ -1,54 +1,39 @@
-#include %A_ScriptDir%/..
-
-#include presets\game_settings.ahk
-
-#include lib\headers.ahk
-#include lib\ui.ahk
-#include lib\joiner.ahk
-#include lib\timers.ahk
-#include lib\utils.ahk
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;               Imports               ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+#include %A_ScriptDir%\..\presets\game_settings.ahk
+#include %A_ScriptDir%\..\lib\macro.ahk
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;              Settings               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-#include %A_ScriptDir%
-#include cfg\cfg_%A_Scriptname%
+#include %A_ScriptDir%\cfg\cfg_%A_Scriptname%
 
-castInterval := DelayBetweenCasts * 1000
-
-guiLabel := "SCULP"
-#include misc\macro.ahk
+global StartKey, StopKey, AbilityKey, DelayBetweenCasts, cast, countdown
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Hotkey, *%StartKey%, Start
-Hotkey, *%StopKey%, Stop
-return
+Macro.start("SCULP")
+Bind(StartKey, "Start")
+Bind(StopKey, "Stop")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Start:
-    Gosub, CastAbility
-    Gosub, UpdateTimer
-    SetTimer, CastAbility, %castInterval%
-    SetTimer, UpdateTimer, 100
-return
+; Casts at once, then every DelayBetweenCasts seconds.
+; A new Start restarts the cycle: the replaced tickers stop on release
+Start() {
+    cast := Every(DelayBetweenCasts * 1000, "SendKey", AbilityKey).fire()
+    countdown := Every(100, "ShowCountdown").fire()
+}
 
-Stop:
-    SetTimer, CastAbility, Off
-    SetTimer, UpdateTimer, Off
-    status.reset()
-return
+Stop() {
+    cast.stop()
+    countdown.stop()
+    Status()
+}
 
-CastAbility:
-    SendKey(AbilityKey)
-    nextCastAt := A_TickCount + castInterval
-return
-
-UpdateTimer:
-    status.text := Round(Max(0, nextCastAt - A_TickCount) / 1000, 1) . "s"
-return
-
-#include misc\misc.ahk
+ShowCountdown() {
+    Status(Round(cast.left / 1000, 1) . "s")
+}

@@ -1,45 +1,35 @@
-#include %A_ScriptDir%/..
-
-#include presets\game_settings.ahk
-
-#include lib\headers.ahk
-#include lib\ui.ahk
-#include lib\joiner.ahk
-#include lib\timers.ahk
-#include lib\utils.ahk
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;               Imports               ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+#include %A_ScriptDir%\..\presets\game_settings.ahk
+#include %A_ScriptDir%\..\lib\macro.ahk
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;              Settings               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-#include %A_ScriptDir%
-#include cfg\cfg_%A_Scriptname%
+#include %A_ScriptDir%\cfg\cfg_%A_Scriptname%
 
-skillKey := 3
-
-guiLabel := skillKey
-#include misc\macro.ahk
+global ThermalKey, skillKey := 3
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Hotkey, *%ThermalKey%, StartStop
-return
+Macro.start(skillKey)
+Bind(ThermalKey, "StartStop")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-StartStop:
-    While GetKeyState(ThermalKey, "p"){
-        status.text := "HOLD"
-        HoldKey(skillKey, 500)
-        lSleep(500)
+StartStop() {
+    While Held(ThermalKey) {
+        Status("HOLD")
+        Hold(skillKey, 500)
+        Wait(500)
 
-        status.text := "TAP"
+        Status("TAP")
         SendKey(skillKey)
-        lSleep(500)
+        Wait(500)
     }
 
-    status.reset()
-Return
-
-#include misc\misc.ahk
+    Status()
+}

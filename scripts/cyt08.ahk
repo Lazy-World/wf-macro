@@ -1,48 +1,38 @@
-#include %A_ScriptDir%/..
-
-#include presets\game_settings.ahk
-
-#include lib\headers.ahk
-#include lib\ui.ahk
-#include lib\joiner.ahk
-#include lib\timers.ahk
-#include lib\utils.ahk
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;               Imports               ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+#include %A_ScriptDir%\..\presets\game_settings.ahk
+#include %A_ScriptDir%\..\lib\macro.ahk
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;              Settings               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-#include %A_ScriptDir%
-#include cfg\cfg_%A_Scriptname%
+#include %A_ScriptDir%\cfg\cfg_%A_Scriptname%
 
-guiLabel := "CYTE-09"
-#include misc\macro.ahk
+global StartStopKey, AbilityInterval, secondAKey
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Hotkey, %StartStopKey%, StartStop
-return
+Macro.start("CYTE-09")
+Bind(StartStopKey, "StartStop")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-StartStop:
-    status.text := AbilityInterval
-    
-    TimeStamp(AbilityStart)
+StartStop() {
+    Status(AbilityInterval)
+
+    cast_at := Now()
     SendKey(secondAKey)
 
-    While ( GetKeyState(StartStopKey, "P") )
-    {
-        if (AbilityInterval < MeasureTime(AbilityStart))
-        {
-            TimeStamp(AbilityStart)
+    While Held(StartStopKey) {
+        if (AbilityInterval < Since(cast_at)) {
+            cast_at := Now()
             SendKey(secondAKey)
         }
-        lSleep(50)
+        Wait(50)
     }
 
-    status.reset()
-Return
-
-#include misc\misc.ahk
+    Status()
+}

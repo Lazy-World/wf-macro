@@ -1,19 +1,5 @@
-; #NoEnv
-; #Persistent
-; #KeyHistory 0
-; #HotkeyInterval 99000000
-; #MaxHotkeysPerInterval 99000000
-; SetDefaultMouseSpeed, 0
-; SetControlDelay, -1
-; SetKeyDelay, -1, -1
-; SetMouseDelay, -1
-; SetBatchLines, -1
-; SetWinDelay, -1
-; SendMode Input
-; ListLines Off
-; CoordMode, Mouse, Client
-
-;---------------------------NEW---------------------------
+;; Headers - directives and runtime settings shared by every macro.
+;; Include first, inside the auto-execute section: everything below runs at startup.
 #SingleInstance Force
 #Persistent
 #NoEnv
@@ -25,11 +11,12 @@
 
 ListLines, Off
 Process, Priority,, A
-CoordMode, Pixel, Screen
-SetStoreCapslockMode, Off
 SendMode Input
-SetBatchLines -1
+SetBatchLines, -1
 SetKeyDelay, -1, -1
-SetMouseDelay, -1, -1
-SetControlDelay -1
-SetWinDelay -1
+SetMouseDelay, -1
+SetControlDelay, -1
+SetWinDelay, -1
+SetStoreCapslockMode, Off
+CoordMode, Pixel, Screen
+DllCall("SetThreadDpiAwarenessContext", "Ptr", -3, "Ptr") ; per monitor aware: pixel coordinates are physical

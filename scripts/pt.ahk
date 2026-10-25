@@ -1,60 +1,49 @@
-#include %A_ScriptDir%/..
-
-#include presets\game_settings.ahk
-
-#include lib\headers.ahk
-#include lib\ui.ahk
-#include lib\joiner.ahk
-#include lib\timers.ahk
-#include lib\utils.ahk
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;               Imports               ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+#include %A_ScriptDir%\..\presets\game_settings.ahk
+#include %A_ScriptDir%\..\lib\macro.ahk
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;              Settings               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-#include %A_ScriptDir%
-#include cfg\cfg_%A_Scriptname%
+#include %A_ScriptDir%\cfg\cfg_%A_Scriptname%
 
-global sleepTime := 2000/fps
-
-guiLabel := "PT"
-#include misc\macro.ahk
+global StartStopKey, shootKey, jumpKey, aimKey, meleeKey, sleepTime := 2000 / fps
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Hotkey, *%StartStopKey%, StartStop
-return
+Macro.start("PT")
+Bind(StartStopKey, "StartStop")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-StartStop:
-	status.text := "PEPE"
+StartStop() {
+    Status("PEPE")
 
-	While GetKeyState(StartStopKey, "p"){
-		SendKey(shootKey, "Down")
-		lSleep(550)
-		SendKey(shootKey, "Up")
+    While Held(StartStopKey) {
+        SendKey(shootKey, "Down")
+        Wait(550)
+        SendKey(shootKey, "Up")
 
-		lSleep(sleepTime)
-		gosub ZawThrow
-	}
+        Wait(sleepTime)
+        ZawThrow()
+    }
 
-	status.reset()
-return
+    Status()
+}
 
-ZawThrow:
-	global sleepTime
+ZawThrow() {
     SendKey(jumpKey)
-	lSleep(sleepTime)
-	SendKey(jumpKey)
-	lSleep(sleepTime)
-	SendKey(aimKey, "Down")
-	lSleep(sleepTime)
-	SendKey(meleeKey)
-	lSleep(sleepTime)
-	SendKey(aimKey, "Up")
-	lSleep(sleepTime)
-Return
-
-#include misc\misc.ahk
+    Wait(sleepTime)
+    SendKey(jumpKey)
+    Wait(sleepTime)
+    SendKey(aimKey, "Down")
+    Wait(sleepTime)
+    SendKey(meleeKey)
+    Wait(sleepTime)
+    SendKey(aimKey, "Up")
+    Wait(sleepTime)
+}
