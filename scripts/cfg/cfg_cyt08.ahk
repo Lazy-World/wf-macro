@@ -4,22 +4,32 @@ StartStopKey = LButton ; Ability 2 spam
 
 ; @Tooltip Умный режим: 2-я способность по иконке элемента у счётчика патронов и спам 4-й. Выключен - 2-я способность по таймеру
 ; @Boolean
-SmartMode := false ; Smart mode
+SmartMode := true  ; Smart mode
 
 ; @If !SmartMode
 ; @Tooltip Интервал между повторными применениями 2-й способности, пока клавиша зажата (в миллисекундах)
 ; @Value
-AbilityInterval := 800 ; Ability 2 interval, ms
+AbilityInterval := 800  ; Ability 2 interval, ms
 
 ; @If SmartMode
 ; @Tooltip Элемент патронов от 2-й способности: пока клавиша зажата и иконка элемента пропала в точке патронов, 2-я применяется снова
-; @Select ["Electricity", "Blast"]
-AmmoElement := "Blast"       ; Ammo element
+; @Select ["Electricity", "Blast", "Gas"]
+AmmoElement := "Electricity" ; Ammo element
 
 ; @If SmartMode
 ; @Tooltip Точка на иконке элемента слева от счётчика патронов (двузначного: при одной цифре иконка сдвигается). Координаты для 1920x1080: SOBEK - 1811, 953 (Electricity), BOAR - 1805, 955 (Blast), KOHM - 1780, 955 (Blast)
 ; @MouseMove
-AmmoSpot := [2619, 1103] ; Ammo pixel
+AmmoSpotGas := [2581, 1102] ; Gas Ammo pixel
+
+; @If SmartMode
+; @Tooltip Точка на иконке элемента слева от счётчика патронов (двузначного: при одной цифре иконка сдвигается). Координаты для 1920x1080: SOBEK - 1811, 953 (Electricity), BOAR - 1805, 955 (Blast), KOHM - 1780, 955 (Blast)
+; @MouseMove
+AmmoSpotBlast := [2581, 1102] ; Blast Ammo pixel
+
+; @If SmartMode
+; @Tooltip Точка на иконке элемента слева от счётчика патронов (двузначного: при одной цифре иконка сдвигается). Координаты для 1920x1080: SOBEK - 1811, 953 (Electricity), BOAR - 1805, 955 (Blast), KOHM - 1780, 955 (Blast)
+; @MouseMove
+AmmoSpotElectricity := [2577, 1099] ; Electricity Ammo pixel
 
 ; @Title Ability 4
 

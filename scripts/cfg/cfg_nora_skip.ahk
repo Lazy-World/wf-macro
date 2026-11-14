@@ -1,6 +1,6 @@
 ﻿; @Tooltip Пропуск через Нору: Esc, клик по кнопке в меню, затем ещё два Esc
 ; @Bind
-SkipKey = XButton2 ; Skip via Nora
+SkipKey = F4       ; Skip via Nora
 
 ; @Title Misc
 
