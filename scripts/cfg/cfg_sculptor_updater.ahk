@@ -8,7 +8,7 @@ StopKey = PgDn ; Stop auto-cast
 
 ; @Tooltip Клавиша способности, которая применяется по таймеру
 ; @Bind
-AbilityKey = 2 ; Ability key
+AbilityKey = 4 ; Ability key
 
 ; @Tooltip Пауза между применениями способности (в секундах)
 ; @Value

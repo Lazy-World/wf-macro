@@ -4,7 +4,7 @@ NukeKey = 1 ; Ability 2 + 1 combo
 
 ; @Tooltip Задержка после каждого применения способности (в миллисекундах)
 ; @Value
-DelayBetweenCasts = 300 ; Delay between casts, ms
+DelayBetweenCasts = 300  ; Delay between casts, ms
 
 ; @Title Misc
 

@@ -2,38 +2,54 @@
 ;;               Imports               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include %A_ScriptDir%\..\presets\game_settings.ahk
-#include %A_ScriptDir%\..\lib\macro.ahk
+#include %A_ScriptDir%\..\lib\headers.ahk
+#include %A_ScriptDir%\..\lib\core.ahk
+#include %A_ScriptDir%\..\lib\joiner.ahk
+#include %A_ScriptDir%\..\lib\ui.ahk
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;              Settings               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include %A_ScriptDir%\cfg\cfg_%A_Scriptname%
 
-global StartKey, StopKey, AbilityKey, DelayBetweenCasts, cast, countdown
+castInterval := DelayBetweenCasts * 1000
+nextCastAt := 0
+
+guiLabel := "SCULP"
+#include %A_ScriptDir%\..\lib\macro.ahk
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Macro.start("SCULP")
-Bind(StartKey, "Start")
-Bind(StopKey, "Stop")
+Hotkey, *%StartKey%, Start
+Hotkey, *%StopKey%, Stop
+return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Casts at once, then every DelayBetweenCasts seconds.
-; A new Start restarts the cycle: the replaced tickers stop on release
-Start() {
-    cast := Every(DelayBetweenCasts * 1000, "SendKey", AbilityKey).fire()
-    countdown := Every(100, "ShowCountdown").fire()
-}
+; A new Start restarts the cycle
+Start:
+    Gosub, CastAbility
+    SetTimer, CastAbility, %castInterval%
+    SetTimer, ShowCountdown, 100
+    Gosub, ShowCountdown
+return
 
-Stop() {
-    cast.stop()
-    countdown.stop()
-    Status()
-}
+Stop:
+    SetTimer, CastAbility, Off
+    SetTimer, ShowCountdown, Off
+    status.reset()
+return
 
-ShowCountdown() {
-    Status(Round(cast.left / 1000, 1) . "s")
-}
+CastAbility:
+    SendKey(AbilityKey)
+    nextCastAt := A_TickCount + castInterval
+return
+
+ShowCountdown:
+    status.text := Round(Max(0, nextCastAt - A_TickCount) / 1000, 1) . "s"
+return
+
+#include %A_ScriptDir%\..\lib\group.ahk

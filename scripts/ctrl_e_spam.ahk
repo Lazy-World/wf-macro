@@ -2,29 +2,33 @@
 ;;               Imports               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include %A_ScriptDir%\..\presets\game_settings.ahk
-#include %A_ScriptDir%\..\lib\macro.ahk
+#include %A_ScriptDir%\..\lib\headers.ahk
+#include %A_ScriptDir%\..\lib\core.ahk
+#include %A_ScriptDir%\..\lib\joiner.ahk
+#include %A_ScriptDir%\..\lib\ui.ahk
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;              Settings               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include %A_ScriptDir%\cfg\cfg_%A_Scriptname%
 
-global StartStopKey, meleeKey, crouchKey
+guiLabel := "MELEE"
+#include %A_ScriptDir%\..\lib\macro.ahk
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Macro.start("MELEE")
-Bind(StartStopKey, "StartStop")
+Hotkey, *%StartStopKey%, StartStop
+return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-StartStop() {
-    Status("+W")
+StartStop:
+    status.text := "+W"
     SendKey(meleeKey, "Down")
 
-    While Held(StartStopKey) {
+    While GetKeyState(StartStopKey, "P") {
         SendKey(crouchKey, "Down")
         Wait(230)
         SendKey(crouchKey, "Up")
@@ -32,5 +36,7 @@ StartStop() {
     }
 
     SendKey(meleeKey, "Up")
-    Status()
-}
+    status.reset()
+return
+
+#include %A_ScriptDir%\..\lib\group.ahk

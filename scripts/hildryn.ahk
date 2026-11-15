@@ -2,35 +2,45 @@
 ;;               Imports               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include %A_ScriptDir%\..\presets\game_settings.ahk
-#include %A_ScriptDir%\..\lib\macro.ahk
+#include %A_ScriptDir%\..\lib\headers.ahk
+#include %A_ScriptDir%\..\lib\core.ahk
+#include %A_ScriptDir%\..\lib\joiner.ahk
+#include %A_ScriptDir%\..\lib\ui.ahk
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;              Settings               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include %A_ScriptDir%\cfg\cfg_%A_Scriptname%
 
-global StartStopKey, AbilityInterval, shoot2Key, secondAKey
+guiLabel := "HILDR"
+#include %A_ScriptDir%\..\lib\macro.ahk
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Macro.start("HILDR")
-Bind(StartStopKey, "StartStop")
+Hotkey, *%StartStopKey%, StartStop
+return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-StartStop() {
-    Status("work")
+StartStop:
+    status.text := "work"
 
     SendKey(shoot2Key, "Down")
-    spam := Every(AbilityInterval, "SendKey", secondAKey)
+    SetTimer, AbilitySpam, %AbilityInterval%
 
-    While Held(StartStopKey)
+    While GetKeyState(StartStopKey, "P")
         Wait(50)
 
     SendKey(shoot2Key, "Up")
-    spam.stop()
+    SetTimer, AbilitySpam, Off
 
-    Status()
-}
+    status.reset()
+return
+
+AbilitySpam:
+    SendKey(secondAKey)
+return
+
+#include %A_ScriptDir%\..\lib\group.ahk

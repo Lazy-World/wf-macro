@@ -2,32 +2,38 @@
 ;;               Imports               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include %A_ScriptDir%\..\presets\game_settings.ahk
-#include %A_ScriptDir%\..\lib\macro.ahk
+#include %A_ScriptDir%\..\lib\headers.ahk
+#include %A_ScriptDir%\..\lib\core.ahk
+#include %A_ScriptDir%\..\lib\joiner.ahk
+#include %A_ScriptDir%\..\lib\ui.ahk
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;              Settings               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include %A_ScriptDir%\cfg\cfg_%A_Scriptname%
 
-global NukeKey, DelayBetweenCasts, firstAKey, secondAKey
+guiLabel := "SEVA"
+#include %A_ScriptDir%\..\lib\macro.ahk
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Macro.start("SEVA")
-Bind(NukeKey, "StartStop")
+Hotkey, *%NukeKey%, StartStop
+return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-StartStop() {
-    Status("..")
+StartStop:
+    status.text := ".."
     SendKey(secondAKey)
     Wait(DelayBetweenCasts)
 
-    Status("...")
+    status.text := "..."
     SendKey(firstAKey)
     Wait(DelayBetweenCasts)
 
-    Status()
-}
+    status.reset()
+return
+
+#include %A_ScriptDir%\..\lib\group.ahk

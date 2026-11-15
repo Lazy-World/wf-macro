@@ -2,35 +2,39 @@
 ;;               Imports               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include %A_ScriptDir%\..\presets\game_settings.ahk
-#include %A_ScriptDir%\..\lib\macro.ahk
+#include %A_ScriptDir%\..\lib\headers.ahk
+#include %A_ScriptDir%\..\lib\core.ahk
+#include %A_ScriptDir%\..\lib\joiner.ahk
+#include %A_ScriptDir%\..\lib\ui.ahk
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;              Settings               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include %A_ScriptDir%\cfg\cfg_%A_Scriptname%
 
-global SkipKey
+guiLabel := "X"
+#include %A_ScriptDir%\..\lib\macro.ahk
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Macro.start("X")
-Bind(SkipKey, "SkipViaNora")
-Bind("F1", "MapClick")
-Bind("F2", "MapClick")
+Hotkey, *%SkipKey%, SkipViaNora
+Hotkey, *F1, MapClick
+Hotkey, *F2, MapClick
+return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-SkipViaNora() {
-    Status("skip")
+SkipViaNora:
+    status.text := "skip"
 
     SendKey("Esc")
     Wait(350)
 
     BlockInput, MouseMove
     MouseCenter()
-    MouseNudge(Ceil(GameScreen.w * 0.74), Ceil(GameScreen.h * 0.55))
+    MouseNudge(Ceil(A_ScreenWidth * 0.74), Ceil(A_ScreenHeight * 0.55))
 
     SendKey("vk01", "Down")
     Wait(200)
@@ -43,11 +47,11 @@ SkipViaNora() {
     Wait(150)
     SendKey("Esc")
 
-    Status()
-}
+    status.reset()
+return
 
-MapClick() {
-    Status("m")
+MapClick:
+    status.text := "m"
     Hold("m", 400, 100)
 
     BlockInput, MouseMove
@@ -60,5 +64,7 @@ MapClick() {
     BlockInput, Off
     BlockInput, MouseMoveOff
 
-    Status()
-}
+    status.reset()
+return
+
+#include %A_ScriptDir%\..\lib\group.ahk

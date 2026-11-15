@@ -16,6 +16,18 @@
 ;; `window := ...` in a script would otherwise overwrite the class.
 #include %A_LineFile%\..\core.ahk
 
+; Blank value -> fallback, otherwise the value limited to the optional max, then min
+ValueOr(value, fallback, min := "", max := "") {
+    local
+    if (value = "")
+        return fallback
+    if (max != "")
+        value := Min(value, max)
+    if (min != "")
+        value := Max(value, min)
+    return value
+}
+
 UiBaseStyle() {
     return "+AlwaysOnTop -Caption +LastFound -SysMenu +ToolWindow -DPIScale +E0x20"
 }
@@ -497,17 +509,17 @@ class UiSlider extends UiElement {
         this._sync_outline()
     }
 
-    ; Fills 0..100% over duration_ms (blank = max - min) counted from start (a Now() value, blank = now).
+    ; Fills 0..100% over duration_ms (blank = max - min) counted from start (a _Now() value, blank = now).
     ; Blocks until done and always ends at 100%.
     run(duration_ms := "", start := "") {
         local
         duration_ms := ValueOr(duration_ms, this.max - this.min)
-        start := ValueOr(start, Now())
+        start := ValueOr(start, _Now())
         if (duration_ms > 0) {
             tick := ObjBindMethod(this, "_fill_since", start, duration_ms)
             SetTimer, % tick, 15
             this._fill_since(start, duration_ms)
-            if ((left := start + duration_ms - Now()) > 0)
+            if ((left := start + duration_ms - _Now()) > 0)
                 Wait(left)
             SetTimer, % tick, Delete
         }
@@ -531,7 +543,7 @@ class UiSlider extends UiElement {
     }
 
     _fill_since(start, duration_ms) {
-        this._fill(Since(start) / duration_ms * 100)
+        this._fill((_Now() - start) / duration_ms * 100)
     }
 
     _fill(percent) {
