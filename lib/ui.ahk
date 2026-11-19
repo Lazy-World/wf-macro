@@ -4,7 +4,7 @@
 ;;   hud.new_text("hp", "100", "main").show()
 ;;   hud.move_by(10, 0).resize_to(200, 40)
 ;;   hud.destroy()
-;; Shared by UiText, UiPicture, UiLine, UiSlider, UiWindow and UiStatusWindow:
+;; Shared by UiText, UiPicture, UiLine, UiSlider and UiWindow:
 ;;   move_to(x, y) / move_to(vec)     move_by(dx, dy) / move_by(vec)
 ;;   resize_to(w, h) / resize_to(vec) resize_by(dw, dh) / resize_by(vec)
 ;;   show(), hide(), destroy(), hwnd(); fields pos, size, visible (read only)
@@ -195,7 +195,7 @@ class UiElement {
         this._lines := []
     }
 
-    ; Fits the outline Lines to segments [[pos, size], ...]: moves the existing ones, creates or destroys the difference
+    ; Fits the outline Lines to segments [[pos, size], ...]: moves and repaints the existing ones, creates or destroys the difference
     _sync_lines(segments, config) {
         local
         global UiLine
@@ -206,6 +206,7 @@ class UiElement {
         for i, seg in segments {
             if (i <= this._lines.Length()) {
                 this._lines[i]._set(seg[1], seg[2])
+                this._lines[i].set_color(config.color)
             } else {
                 line := this._lines[i] := new UiLine(this.name ".outline" i, seg[1], seg[2], config)
                 if this.visible
@@ -291,6 +292,23 @@ class UiLine extends UiElement {
             WinSet, TransColor, % bg
         else
             WinSet, Transparent, % this.no_bg ? 0 : this.alpha
+    }
+
+    ; Repaints the rectangle: an outline can change colour (e.g. while the group is paused)
+    set_color(color) {
+        local
+        if (!this._alive || color = "" || this.color = color)
+            return this
+        this.color := color
+        bg := this.no_bg ? "151515" : this.color
+        h := this._h
+        Gui, %h%: Color, % bg
+        ; WinSet acts on the Last Found Window, which belongs to the calling thread, not to this line
+        if this.blur
+            WinSet, TransColor, % bg, ahk_id %h%
+        else
+            WinSet, Transparent, % this.no_bg ? 0 : this.alpha, ahk_id %h%
+        return this
     }
 
     _draw() {
@@ -789,169 +807,5 @@ class UiManager {
 
     __Delete() {
         this.destroy()
-    }
-}
-
-;; UiStatusWindow - facade over UiWindow: a header with an icon on top and a body "<label>: <value>" under it.
-;;   status := new UiStatusWindow(x, y, "HILDR")   ; build + show with UiDefaultTheme()
-;;   status.text := "GO"                         ; body -> "HILDR: GO"
-;;   cur := status.text                          ; read the value
-;;   status.reset()                              ; body -> "HILDR: off"
-;;   status.suspended := true                    ; header -> "suspended"
-;; Several macros stack up via place(slot, last): the header belongs to slot 1, bodies go below it
-;; in slot order with side outlines, the last one is closed by a bottom outline.
-;; pos is the stack origin (header top-left), size is (width, body height).
-;; opt overrides {w: 120, h: 25, head_h: 22, gap: 4, icon: "D", idle: "off", style: "accent", color: "",
-;; show: true, name: auto, theme: UiDefaultTheme()}; opt.config is a raw UiWindow config merged over the body defaults.
-class UiStatusWindow extends UiElement {
-    static _n := 0
-
-    __new(x, y, label := "", opt := "") {
-        local
-        global UiStatusWindow, UiVector, UiWindow
-        theme := IsObject(opt.theme) ? opt.theme : UiDefaultTheme()
-        name := opt.name != "" ? opt.name : "status" (++UiStatusWindow._n)
-        this._init(name, new UiVector(x, y), new UiVector(ValueOr(opt.w, 120), ValueOr(opt.h, 25)))
-        this._gap := ValueOr(opt.gap, 4)
-        this._head_h := ValueOr(opt.head_h, 22)
-        this._icon := ValueOr(opt.icon, "D")
-        this._idle := ValueOr(opt.idle, "off")
-        this._suspended := false
-        this._slot := 0 ; not placed yet
-        this._last := true
-
-        this.head := new UiWindow(name ".head", this.pos, new UiVector(this.size.x, this._head_h), theme
-            , {margin: 2, blur: 1, outline: [0, 1, 0, 0]})
-        this.head.new_text("icon", this._icon, "menu_icon", "auto")
-
-        this.win := new UiWindow(name, new UiVector(x, this._body_y(1)), this.size, theme, this._config(opt.config))
-        this.win.new_text("key", label != "" ? label ":" : "", "main", "left x10 ym")
-        this.win.new_text("value", this._idle, ValueOr(opt.style, "accent"), "left x" (10 + this.win.measure("key")[1] + 4) " yp")
-        if (opt.color != "")
-            this.win.edit_color("value", opt.color)
-
-        if ValueOr(opt.show, true)
-            this.place(1)
-    }
-
-    text {
-        get {
-            return this.label("value")
-        }
-        set {
-            this.label("value", value)
-            return value
-        }
-    }
-
-    suspended {
-        get {
-            return this._suspended
-        }
-        set {
-            this._suspended := value ? true : false
-            this.head.edit_text("icon", this._suspended ? "suspended" : this._icon)
-            return value
-        }
-    }
-
-    reset() {
-        this.text := this._idle
-        return this
-    }
-
-    ; slot 1 = top body (it also shows the header); last closes the stack. Shows the stack.
-    place(slot, last := true) {
-        last := last ? true : false
-        if (slot != this._slot || last != this._last) {
-            this._slot := slot, this._last := last
-            this._layout()
-        }
-        return this.show()
-    }
-
-    color(hex) {
-        this.win.edit_color("value", hex)
-        return this
-    }
-
-    ; label(name) -> text of a body control; label(name, text) sets it
-    label(name, params*) {
-        if (params.Length() = 0)
-            return this.win.text().get_control(name).body
-        this.win.edit_text(name, params[1])
-        return this
-    }
-
-    ; Adds a text row under the existing ones and grows the body to fit it.
-    ; opt: {style: "info", align: "center" | "left" | "right", color}
-    add(name, text, opt := "") {
-        this.win.new_text(name, text, ValueOr(opt.style, "info"), ValueOr(opt.align, "center") " x0 y+0")
-        if (opt.color != "")
-            this.win.edit_color(name, opt.color)
-        return this.resize_by(0, this.win.text().get_size(name)[2])
-    }
-
-    ; x, y relative to the body
-    add_slider(name, x, y, w, h, min, max, val, opt := "") {
-        local
-        global UiVector
-        this.win.new_slider(name, new UiVector(x, y), new UiVector(w, h), min, max, val, opt)
-        return this
-    }
-
-    slider(name) {
-        return this.win.slider(name)
-    }
-
-    hwnd() {
-        return this.win.hwnd()
-    }
-
-    window() {
-        return this.win
-    }
-
-    _config(config) {
-        local
-        merged := {blur: 1, outline: [0, 0, 0, 1]}
-        if IsObject(config)
-            for k, v in config
-                merged[k] := v
-        return merged
-    }
-
-    _body_y(slot) {
-        return this.pos.y + this._head_h + this._gap + (slot - 1) * (this.size.y + this._gap)
-    }
-
-    ; At most one geometry and outline update per window (unchanged geometry is skipped)
-    _layout() {
-        local
-        global UiVector
-        this.head.move_to(this.pos).resize_to(this.size.x, this._head_h)
-        this.win.set_outline(this._last ? [0, 0, 0, 1] : [1, 0, 1, 0]
-            , new UiVector(this.pos.x, this._body_y(Max(this._slot, 1))), this.size)
-    }
-
-    _update(old_pos, old_size) {
-        this._layout()
-    }
-
-    _parts() {
-        return [this.win, this.head]
-    }
-
-    _show() {
-        if (!this._slot) {
-            this._slot := 1
-            this._layout()
-        }
-        if !this.win.visible
-            this.win.show()
-        if (this._slot = 1 && !this.head.visible)
-            this.head.show()
-        else if (this._slot != 1 && this.head.visible)
-            this.head.hide()
     }
 }

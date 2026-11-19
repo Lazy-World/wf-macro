@@ -2,16 +2,12 @@
 ;;               Imports               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include %A_ScriptDir%\..\presets\game_settings.ahk
-#include %A_ScriptDir%\..\lib\headers.ahk
-#include %A_ScriptDir%\..\lib\core.ahk
-#include %A_ScriptDir%\..\lib\joiner.ahk
-#include %A_ScriptDir%\..\lib\ui.ahk
+#include %A_ScriptDir%\cfg\cfg_%A_Scriptname%
+#include %A_ScriptDir%\..\lib\macro.ahk
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;              Settings               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-#include %A_ScriptDir%\cfg\cfg_%A_Scriptname%
-
 ; Ammo element icon colors as [color, variation]. A new element is a row in
 ; `ammo` and `pos` plus its name in the AmmoElement @Select of the cfg
 class Cyte {
@@ -29,17 +25,19 @@ if (SmartMode && !Cyte.ammo.HasKey(AmmoElement)) {
     ExitApp
 }
 
-guiLabel := "CYTE"
-#include %A_ScriptDir%\..\lib\macro.ahk
-
 second_at := 0
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                 UI                  ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+status.new_text("msg", "CYTE", "title", "auto")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Smart mode only polls the keys, so they still reach the game
 if SmartMode {
-    status.text := AmmoElement
+    status.edit_text("msg", AmmoElement)
     SetTimer, Watch, 10
 } else
     Hotkey, *%StartStopKey%, StartStop
@@ -49,7 +47,7 @@ return
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 StartStop:
-    status.text := AbilityInterval
+    status.edit_text("msg", AbilityInterval)
 
     cast_at := A_TickCount
     SendKey(secondAKey)
@@ -62,28 +60,20 @@ StartStop:
         Wait(50)
     }
 
-    status.reset()
+    status.edit_text("msg", "CYTE")
 return
 
 ; One smart mode tick, only in the game window: ability 2 when the ammo
 ; lost the element icon, ability 4 while its key is held
 Watch:
-    if !WinActive("ahk_exe Warframe.x64.exe")
+    if !WfActive()
         return
 
     ; The ammo icon comes back a few frames after the cast
-    if (GetKeyState(StartStopKey, "P") && A_TickCount - second_at >= Cyte.recheck && !Seen(Cyte.pos[AmmoElement], Cyte.ammo[AmmoElement])) {
+    if (GetKeyState(StartStopKey, "P") && A_TickCount - second_at >= Cyte.recheck && !PixelSeen(Cyte.pos[AmmoElement], Cyte.ammo[AmmoElement])) {
         SendKey(secondAKey)
         second_at := A_TickCount
     }
     if (AutoFourth && GetKeyState(FourthKey, "P"))
         SendKey(fourthAKey)
 return
-
-; Is the screen pixel at spot [x, y] within the [color, variation]
-Seen(spot, color) {
-    PixelSearch,,, % spot[1], % spot[2], % spot[1], % spot[2], % color[1], % color[2], Fast RGB
-    return !ErrorLevel
-}
-
-#include %A_ScriptDir%\..\lib\group.ahk

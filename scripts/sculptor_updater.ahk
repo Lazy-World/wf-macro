@@ -2,21 +2,16 @@
 ;;               Imports               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include %A_ScriptDir%\..\presets\game_settings.ahk
-#include %A_ScriptDir%\..\lib\headers.ahk
-#include %A_ScriptDir%\..\lib\core.ahk
-#include %A_ScriptDir%\..\lib\joiner.ahk
-#include %A_ScriptDir%\..\lib\ui.ahk
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;              Settings               ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include %A_ScriptDir%\cfg\cfg_%A_Scriptname%
+#include %A_ScriptDir%\..\lib\macro.ahk
 
 castInterval := DelayBetweenCasts * 1000
 nextCastAt := 0
 
-guiLabel := "SCULP"
-#include %A_ScriptDir%\..\lib\macro.ahk
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                 UI                  ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+status.new_text("msg", "SCULP", "title", "auto")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
@@ -40,7 +35,7 @@ return
 Stop:
     SetTimer, CastAbility, Off
     SetTimer, ShowCountdown, Off
-    status.reset()
+    status.edit_text("msg", "SCULP")
 return
 
 CastAbility:
@@ -49,7 +44,5 @@ CastAbility:
 return
 
 ShowCountdown:
-    status.text := Round(Max(0, nextCastAt - A_TickCount) / 1000, 1) . "s"
+    status.edit_text("msg", Round(Max(0, nextCastAt - A_TickCount) / 1000, 1) . "s")
 return
-
-#include %A_ScriptDir%\..\lib\group.ahk

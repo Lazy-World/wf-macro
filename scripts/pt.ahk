@@ -2,20 +2,15 @@
 ;;               Imports               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include %A_ScriptDir%\..\presets\game_settings.ahk
-#include %A_ScriptDir%\..\lib\headers.ahk
-#include %A_ScriptDir%\..\lib\core.ahk
-#include %A_ScriptDir%\..\lib\joiner.ahk
-#include %A_ScriptDir%\..\lib\ui.ahk
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;              Settings               ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include %A_ScriptDir%\cfg\cfg_%A_Scriptname%
+#include %A_ScriptDir%\..\lib\macro.ahk
 
 sleepTime := 2000 / fps
 
-guiLabel := "PT"
-#include %A_ScriptDir%\..\lib\macro.ahk
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                 UI                  ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+status.new_text("msg", "PT", "title", "auto")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
@@ -27,7 +22,7 @@ return
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 StartStop:
-    status.text := "PEPE"
+    status.edit_text("msg", "PEPE")
 
     While GetKeyState(StartStopKey, "P") {
         SendKey(shootKey, "Down")
@@ -38,7 +33,7 @@ StartStop:
         Gosub, ZawThrow
     }
 
-    status.reset()
+    status.edit_text("msg", "PT")
 return
 
 ZawThrow:
@@ -53,5 +48,3 @@ ZawThrow:
     SendKey(aimKey, "Up")
     Wait(sleepTime)
 return
-
-#include %A_ScriptDir%\..\lib\group.ahk

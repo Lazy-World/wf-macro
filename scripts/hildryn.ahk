@@ -2,18 +2,13 @@
 ;;               Imports               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include %A_ScriptDir%\..\presets\game_settings.ahk
-#include %A_ScriptDir%\..\lib\headers.ahk
-#include %A_ScriptDir%\..\lib\core.ahk
-#include %A_ScriptDir%\..\lib\joiner.ahk
-#include %A_ScriptDir%\..\lib\ui.ahk
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;              Settings               ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include %A_ScriptDir%\cfg\cfg_%A_Scriptname%
-
-guiLabel := "HILDR"
 #include %A_ScriptDir%\..\lib\macro.ahk
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                 UI                  ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+status.new_text("msg", "HILDR", "title", "auto")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
@@ -25,7 +20,7 @@ return
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 StartStop:
-    status.text := "work"
+    status.edit_text("msg", "work")
 
     SendKey(shoot2Key, "Down")
     SetTimer, AbilitySpam, %AbilityInterval%
@@ -36,11 +31,9 @@ StartStop:
     SendKey(shoot2Key, "Up")
     SetTimer, AbilitySpam, Off
 
-    status.reset()
+    status.edit_text("msg", "HILDR")
 return
 
 AbilitySpam:
     SendKey(secondAKey)
 return
-
-#include %A_ScriptDir%\..\lib\group.ahk

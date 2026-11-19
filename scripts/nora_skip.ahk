@@ -2,18 +2,13 @@
 ;;               Imports               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include %A_ScriptDir%\..\presets\game_settings.ahk
-#include %A_ScriptDir%\..\lib\headers.ahk
-#include %A_ScriptDir%\..\lib\core.ahk
-#include %A_ScriptDir%\..\lib\joiner.ahk
-#include %A_ScriptDir%\..\lib\ui.ahk
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;              Settings               ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include %A_ScriptDir%\cfg\cfg_%A_Scriptname%
-
-guiLabel := "X"
 #include %A_ScriptDir%\..\lib\macro.ahk
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                 UI                  ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+status.new_text("msg", "X", "title", "auto")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
@@ -27,7 +22,7 @@ return
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 SkipViaNora:
-    status.text := "skip"
+    status.edit_text("msg", "skip")
 
     SendKey("Esc")
     Wait(350)
@@ -47,11 +42,11 @@ SkipViaNora:
     Wait(150)
     SendKey("Esc")
 
-    status.reset()
+    status.edit_text("msg", "X")
 return
 
 MapClick:
-    status.text := "m"
+    status.edit_text("msg", "m")
     Hold("m", 400, 100)
 
     BlockInput, MouseMove
@@ -64,7 +59,5 @@ MapClick:
     BlockInput, Off
     BlockInput, MouseMoveOff
 
-    status.reset()
+    status.edit_text("msg", "X")
 return
-
-#include %A_ScriptDir%\..\lib\group.ahk

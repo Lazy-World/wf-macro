@@ -2,18 +2,13 @@
 ;;               Imports               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include %A_ScriptDir%\..\presets\game_settings.ahk
-#include %A_ScriptDir%\..\lib\headers.ahk
-#include %A_ScriptDir%\..\lib\core.ahk
-#include %A_ScriptDir%\..\lib\joiner.ahk
-#include %A_ScriptDir%\..\lib\ui.ahk
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;              Settings               ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #include %A_ScriptDir%\cfg\cfg_%A_Scriptname%
-
-guiLabel := "SEVA"
 #include %A_ScriptDir%\..\lib\macro.ahk
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                 UI                  ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+status.new_text("msg", "SEVA", "title", "auto")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
@@ -25,15 +20,13 @@ return
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 StartStop:
-    status.text := ".."
+    status.edit_text("msg", "..")
     SendKey(secondAKey)
     Wait(DelayBetweenCasts)
 
-    status.text := "..."
+    status.edit_text("msg", "...")
     SendKey(firstAKey)
     Wait(DelayBetweenCasts)
 
-    status.reset()
+    status.edit_text("msg", "SEVA")
 return
-
-#include %A_ScriptDir%\..\lib\group.ahk
