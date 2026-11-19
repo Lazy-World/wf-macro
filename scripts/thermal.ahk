@@ -10,8 +10,8 @@ skillKey := 3
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                 UI                  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-status.new_text("key", skillKey ":", "main", "left x10 ym")
-status.new_text("value", "", "accent", "left x" (10 + status.measure("key")[1] + 15) " yp")
+status.new_text("key", skillKey ":", "main", "left x6 ym")
+status.new_text("value", "", "accent", "left x" (6 + status.measure("key")[1] + 6) " yp")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;

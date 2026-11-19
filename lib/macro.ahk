@@ -8,8 +8,8 @@
 ;; Creates the super-globals `ui` (UiManager), `status_head` (the hat over the
 ;; stack) and `status` (the macro's own row). A macro fills its row explicitly:
 ;;
-;;   status.new_text("key", "HILDR:", "main", "left x10 ym")
-;;   status.new_text("value", "", "accent", "left x" (10 + status.measure("key")[1] + 15) " yp")
+;;   status.new_text("key", "HILDR:", "main", "left x6 ym")
+;;   status.new_text("value", "", "accent", "left x" (6 + status.measure("key")[1] + 6) " yp")
 ;;   status.edit_text("value", "work")
 ;;
 ;; Joins the joiner group, binds the group keys (reload / unload / pause) and
