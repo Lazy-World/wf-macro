@@ -8,7 +8,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                 UI                  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-status.new_text("msg", "HILDR", "title", "auto")
+status.new_text("key", "HILDR:", "main", "left x10 ym")
+status.new_text("value", "", "accent", "left x" (10 + status.measure("key")[1] + 15) " yp")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
@@ -20,7 +21,7 @@ return
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 StartStop:
-    status.edit_text("msg", "work")
+    status.edit_text("value", "work")
 
     SendKey(shoot2Key, "Down")
     SetTimer, AbilitySpam, %AbilityInterval%
@@ -31,7 +32,7 @@ StartStop:
     SendKey(shoot2Key, "Up")
     SetTimer, AbilitySpam, Off
 
-    status.edit_text("msg", "HILDR")
+    status.edit_text("value", "")
 return
 
 AbilitySpam:

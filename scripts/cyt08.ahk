@@ -30,14 +30,15 @@ second_at := 0
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                 UI                  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-status.new_text("msg", "CYTE", "title", "auto")
+status.new_text("key", "CYTE:", "main", "left x10 ym")
+status.new_text("value", "", "accent", "left x" (10 + status.measure("key")[1] + 15) " yp")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Smart mode only polls the keys, so they still reach the game
 if SmartMode {
-    status.edit_text("msg", AmmoElement)
+    status.edit_text("value", AmmoElement)
     SetTimer, Watch, 10
 } else
     Hotkey, *%StartStopKey%, StartStop
@@ -47,7 +48,7 @@ return
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 StartStop:
-    status.edit_text("msg", AbilityInterval)
+    status.edit_text("value", AbilityInterval)
 
     cast_at := A_TickCount
     SendKey(secondAKey)
@@ -60,7 +61,7 @@ StartStop:
         Wait(50)
     }
 
-    status.edit_text("msg", "CYTE")
+    status.edit_text("value", "")
 return
 
 ; One smart mode tick, only in the game window: ability 2 when the ammo

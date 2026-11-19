@@ -11,7 +11,8 @@ nextCastAt := 0
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                 UI                  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-status.new_text("msg", "SCULP", "title", "auto")
+status.new_text("key", "SCULP:", "main", "left x10 ym")
+status.new_text("value", "", "accent", "left x" (10 + status.measure("key")[1] + 15) " yp")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
@@ -35,7 +36,7 @@ return
 Stop:
     SetTimer, CastAbility, Off
     SetTimer, ShowCountdown, Off
-    status.edit_text("msg", "SCULP")
+    status.edit_text("value", "")
 return
 
 CastAbility:
@@ -44,5 +45,5 @@ CastAbility:
 return
 
 ShowCountdown:
-    status.edit_text("msg", Round(Max(0, nextCastAt - A_TickCount) / 1000, 1) . "s")
+    status.edit_text("value", Round(Max(0, nextCastAt - A_TickCount) / 1000, 1) . "s")
 return

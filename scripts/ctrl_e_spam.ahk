@@ -8,7 +8,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                 UI                  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-status.new_text("msg", "MELEE", "title", "auto")
+status.new_text("key", "MELEE:", "main", "left x10 ym")
+status.new_text("value", "", "accent", "left x" (10 + status.measure("key")[1] + 15) " yp")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
@@ -20,7 +21,7 @@ return
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 StartStop:
-    status.edit_text("msg", "+W")
+    status.edit_text("value", "+W")
     SendKey(meleeKey, "Down")
 
     While GetKeyState(StartStopKey, "P") {
@@ -31,5 +32,5 @@ StartStop:
     }
 
     SendKey(meleeKey, "Up")
-    status.edit_text("msg", "MELEE")
+    status.edit_text("value", "")
 return

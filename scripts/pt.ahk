@@ -10,7 +10,8 @@ sleepTime := 2000 / fps
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                 UI                  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-status.new_text("msg", "PT", "title", "auto")
+status.new_text("key", "PT:", "main", "left x10 ym")
+status.new_text("value", "", "accent", "left x" (10 + status.measure("key")[1] + 15) " yp")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
@@ -22,7 +23,7 @@ return
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 StartStop:
-    status.edit_text("msg", "PEPE")
+    status.edit_text("value", "PEPE")
 
     While GetKeyState(StartStopKey, "P") {
         SendKey(shootKey, "Down")
@@ -33,7 +34,7 @@ StartStop:
         Gosub, ZawThrow
     }
 
-    status.edit_text("msg", "PT")
+    status.edit_text("value", "")
 return
 
 ZawThrow:

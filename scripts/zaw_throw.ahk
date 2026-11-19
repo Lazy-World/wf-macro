@@ -8,7 +8,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                 UI                  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-status.new_text("msg", "ZAW", "title", "auto")
+status.new_text("key", "ZAW:", "main", "left x10 ym")
+status.new_text("value", "", "accent", "left x" (10 + status.measure("key")[1] + 15) " yp")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
@@ -20,7 +21,7 @@ return
 ;;               Source                ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 StartStop:
-    status.edit_text("msg", "GO")
+    status.edit_text("value", "GO")
 
     SendKey(jumpKey)
     Wait(25)
@@ -33,5 +34,5 @@ StartStop:
     SendKey(aimKey, "Up")
     Wait(500)
 
-    status.edit_text("msg", "ZAW")
+    status.edit_text("value", "")
 return

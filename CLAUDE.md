@@ -22,7 +22,9 @@ Safe checks instead:
    MiscPauseKey := "F22"
    #include D:\__git\personal\wf-macro\lib\macro.ahk
 
-   status.new_text("msg", "TEST", "title", "auto")
+   status.new_text("key", "TEST:", "main", "left x10 ym")
+   status.new_text("value", "", "accent", "left x" (10 + status.measure("key")[1] + 15) " yp")
+   status.edit_text("value", "TEST")
    ExitApp
    ```
 
@@ -48,12 +50,12 @@ Git Bash rewrites `/ErrorStdOut` into `D:/.../ErrorStdOut`, and AHK then opens a
 - `lib/wf.ahk` — Warframe-only helpers (`WfActive`, `PixelSeen`).
 - `lib/ui.ahk` — overlay widgets (`UiWindow`, `UiText`, `UiSlider`, ...).
 - `lib/joiner.ahk` — runs all launched macros as one group (pause / reload / exit, stacking order).
-- `lib/macro.ahk` — the shared beginning: includes the libs above, creates `ui` and `status`, joins the group, binds group keys, gates hotkeys to the game.
+- `lib/macro.ahk` — the shared beginning: includes the libs above, creates `ui`, `status` and its hat `status_head`, joins the group, binds group keys, gates hotkeys to the game.
 - `scripts/<name>.ahk` — a macro; `scripts/cfg/cfg_<name>.ahk` — its settings (data only).
 
 Include order is fixed: `presets/game_settings.ahk` → `cfg` → `lib/macro.ahk`. Do not add the lib includes back to scripts.
 
-Keep scripts explicit: three includes, a UI block, hotkeys, label handlers. No bootstrap class, no `Macro.begin()`, no template status. The status is a plain `UiWindow`: `new_text`, `edit_text`, `new_slider`, `resize_to`.
+Keep scripts explicit: three includes, a UI block, hotkeys, label handlers. No bootstrap class, no `Macro.begin()`, no template status. The status is a plain `UiWindow`: each macro adds its own `key` and `value` texts (white `main` left, yellow `accent` after it) and sets the value with `edit_text("value", ...)`; the hat shows `suspended` while the group is paused.
 
 ## Known limitation
 
