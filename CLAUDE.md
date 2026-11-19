@@ -55,7 +55,7 @@ Git Bash rewrites `/ErrorStdOut` into `D:/.../ErrorStdOut`, and AHK then opens a
 
 Include order is fixed: `presets/game_settings.ahk` → `cfg` → `lib/macro.ahk`. Do not add the lib includes back to scripts.
 
-Keep scripts explicit: three includes, a UI block, hotkeys, label handlers. No bootstrap class, no `Macro.begin()`, no template status. The status is a plain `UiWindow`: each macro adds its own `key` and `value` texts (white `main` left, yellow `accent` after it) and sets the value with `edit_text("value", ...)`; the hat shows `suspended` while the group is paused.
+Keep scripts explicit: three includes, a UI block, hotkeys, label handlers. No bootstrap class, no `Macro.begin()`, no template status. The status is a plain `UiWindow`: each macro adds its own `key` and `value` texts (white `main` left, yellow `accent` after it) and sets the value with `edit_text("value", ...)`; a macro that shows a picture in that slot uses `new_picture` on the same row. The hat shows `suspended` while the group is paused.
 
 ## Known limitation
 

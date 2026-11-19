@@ -42,6 +42,12 @@ UiDefaultTheme() {
                 , info:      {name: "Helvetica", size: 13, color: "FFF6BD"}}}
 }
 
+; Relative picture paths resolve against A_ScriptDir "\pictures\"
+UiPicturePath(file) {
+    local
+    return RegExMatch(file, "^(?:[A-Za-z]:[\\/]|\\\\)") ? file : A_ScriptDir "\pictures\" file
+}
+
 ; [pos, size] of the [left, top, right, bottom] edges around a rect.
 ; Top and bottom span the side edges that are drawn (ol_left / ol_right = 1).
 UiEdgeOutlineLayout(vec_pos, vec_size, bold, ol_left, ol_right, border) {
@@ -334,9 +340,10 @@ class UiLine extends UiElement {
     }
 }
 
-;; UiText - transparent text layer; pos/size is the outer rect, controls sit inside the margin.
+;; UiText - transparent text and picture layer; pos/size is the outer rect, controls sit inside the margin.
 ;;   txt := new UiText("t", new UiVector(0, 0), new UiVector(120, 25), UiDefaultTheme())
 ;;   txt.new_text("hp", "100", "main", "left x10 ym").show()
+;;   txt.new_picture("badge", "ok.png", "x106 y1 w20 h20").show()
 ;; prop: "" / "auto" (centered), "left", "right" or raw Gui options (alignment defaults to center).
 ;; config: margin 2. new_text config: fit_x, fit_y (follow the layer's width / height on resize).
 class UiText extends UiElement {
@@ -347,7 +354,7 @@ class UiText extends UiElement {
         this._init(name, vec_pos, vec_size)
         this.theme := IsObject(theme) ? theme : UiDefaultTheme()
         this.margin := ValueOr(config.margin, 2)
-        this.controls := {}
+        this.controls := {}, this.pictures := {}
 
         this._h := h := this._new_gui()
         Gui, %h%: Color, % this._key
@@ -361,7 +368,7 @@ class UiText extends UiElement {
         font := this.theme.fonts[category]
         if !IsObject(font)
             throw Exception("Unknown font category: " category, -1)
-        if this.controls.HasKey(control_name)
+        if (this.controls.HasKey(control_name) || this.pictures.HasKey(control_name))
             throw Exception("Control already exists: " control_name, -1)
 
         h := this._h
@@ -369,6 +376,25 @@ class UiText extends UiElement {
         Gui, %h%: Add, Text, % this._placement(prop) " w" this.size.x - 2 * this.margin " BackgroundTrans 0x200 HwndhCtl c" font.color, % body
         this.controls[control_name] := {control: hCtl, body: body, font: font.name, font_size: font.size, color: font.color
             , fit_x: ValueOr(config.fit_x, 0), fit_y: ValueOr(config.fit_y, 0)}
+        return this
+    }
+
+    ; Image control on the same layer; prop is raw Gui placement and must carry the size
+    new_picture(control_name, file, prop := "") {
+        local
+        if !this._alive
+            return this
+        if (this.controls.HasKey(control_name) || this.pictures.HasKey(control_name))
+            throw Exception("Control already exists: " control_name, -1)
+
+        file := UiPicturePath(file)
+        h := this._h
+        Gui, %h%: Add, Picture, % prop " AltSubmit BackgroundTrans HwndhCtl", % file
+        this.pictures[control_name] := {control: hCtl}
+        ; A picture added to a layer that is already on screen keeps its opaque
+        ; background until the layer repaints
+        if this.visible
+            WinSet, Redraw, , ahk_id %h%
         return this
     }
 
@@ -467,7 +493,7 @@ class UiPicture extends UiElement {
     __new(name, file, vec_pos, vec_size, config := "") {
         local
         this._init(name, vec_pos, vec_size)
-        this.file  := RegExMatch(file, "^(?:[A-Za-z]:[\\/]|\\\\)") ? file : A_ScriptDir "\pictures\" file
+        this.file  := UiPicturePath(file)
         this.color := ValueOr(config.color, "151515")
         this.alpha := ValueOr(config.alpha, 255)
 
@@ -640,6 +666,11 @@ class UiWindow extends UiElement {
 
     new_text(control_name, body, category, prop := "", config := "") {
         this.text_window.new_text(control_name, body, category, prop, config)
+        return this
+    }
+
+    new_picture(control_name, file, prop := "") {
+        this.text_window.new_picture(control_name, file, prop)
         return this
     }
 

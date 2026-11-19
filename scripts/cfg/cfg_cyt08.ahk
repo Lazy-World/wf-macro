@@ -16,18 +16,18 @@ AbilityInterval := 800  ; Ability 2 interval, ms
 ; @Select ["Electricity", "Blast", "Gas"]
 AmmoElement := "Electricity" ; Ammo element
 
-; @If SmartMode
-; @Tooltip Точка на иконке элемента слева от счётчика патронов (двузначного: при одной цифре иконка сдвигается). Координаты для 1920x1080: SOBEK - 1811, 953 (Electricity), BOAR - 1805, 955 (Blast), KOHM - 1780, 955 (Blast)
+; @If AmmoElement == Gas
+; @Tooltip Точка иконки Gas слева от счётчика патронов; при одной цифре иконка сдвигается
 ; @MouseMove
 AmmoSpotGas := [2581, 1102] ; Gas Ammo pixel
 
-; @If SmartMode
-; @Tooltip Точка на иконке элемента слева от счётчика патронов (двузначного: при одной цифре иконка сдвигается). Координаты для 1920x1080: SOBEK - 1811, 953 (Electricity), BOAR - 1805, 955 (Blast), KOHM - 1780, 955 (Blast)
+; @If AmmoElement == Blast
+; @Tooltip Точка иконки Blast слева от счётчика патронов; при одной цифре иконка сдвигается. 1920x1080: BOAR - 1805, 955, KOHM - 1780, 955
 ; @MouseMove
 AmmoSpotBlast := [2581, 1102] ; Blast Ammo pixel
 
-; @If SmartMode
-; @Tooltip Точка на иконке элемента слева от счётчика патронов (двузначного: при одной цифре иконка сдвигается). Координаты для 1920x1080: SOBEK - 1811, 953 (Electricity), BOAR - 1805, 955 (Blast), KOHM - 1780, 955 (Blast)
+; @If AmmoElement == Electricity
+; @Tooltip Точка иконки Electricity слева от счётчика патронов; при одной цифре иконка сдвигается. 1920x1080: SOBEK - 1811, 953
 ; @MouseMove
 AmmoSpotElectricity := [2577, 1099] ; Electricity Ammo pixel
 

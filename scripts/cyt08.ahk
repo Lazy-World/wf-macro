@@ -8,10 +8,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;              Settings               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Ammo element icon colors as [color, variation]. A new element is a row in
-; `ammo` and `pos` plus its name in the AmmoElement @Select of the cfg
+; Ammo element pixel color [color, variation], status picture and overlay spot.
+; A new element is a row in `ammo`, `icons` and `pos` plus its name in the
+; AmmoElement @Select of the cfg
 class Cyte {
     static ammo := {"Electricity": [0xB28FCD, 50], "Blast": [0xA57374, 20], "Gas": [0x62cbac, 40]}
+    static icons := {"Electricity": "DT_ELECTRICITY.png", "Blast": "DT_BLAST.png", "Gas": "DT_GAS.png"}
     static pos := ""                ; filled below: the cfg spots don't exist yet at class init
     static recheck := 50            ; ms after pressing 2 before the ammo pixel counts again
 }
@@ -20,7 +22,7 @@ class Cyte {
 ; spots are still blank there. Build the element -> spot map here instead
 Cyte.pos := {"Electricity": AmmoSpotElectricity, "Blast": AmmoSpotBlast, "Gas": AmmoSpotGas}
 
-if (SmartMode && !Cyte.ammo.HasKey(AmmoElement)) {
+if (SmartMode && (!Cyte.ammo.HasKey(AmmoElement) || !Cyte.icons.HasKey(AmmoElement))) {
     MsgBox, 16, CYTE, Unknown AmmoElement: %AmmoElement%
     ExitApp
 }
@@ -31,16 +33,22 @@ second_at := 0
 ;;                 UI                  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 status.new_text("key", "CYTE:", "main", "left x6 ym")
-status.new_text("value", "", "accent", "left x" (6 + status.measure("key")[1] + 6) " yp")
+key_size := status.measure("key")
+value_x := 6 + key_size[1] + 6
+
+; Smart mode shows the ammo element as an icon in the value slot
+if SmartMode
+    status.new_picture("element", Cyte.icons[AmmoElement], "x" value_x " y0 w" key_size[2] " h" key_size[2])
+else
+    status.new_text("value", "", "accent", "left x" value_x " yp")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               Hotkeys               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Smart mode only polls the keys, so they still reach the game
-if SmartMode {
-    status.edit_text("value", AmmoElement)
+if SmartMode
     SetTimer, Watch, 10
-} else
+else
     Hotkey, *%StartStopKey%, StartStop
 return
 
