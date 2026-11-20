@@ -6,6 +6,11 @@ StartStopKey = LButton ; Ability 2 spam
 ; @Boolean
 SmartMode := true  ; Smart mode
 
+; @If SmartMode
+; @Tooltip Автоопределение элемента патронов: раз в секунду текущий элемент выбирается по иконке у счётчика
+; @Boolean
+AutoScan := true  ; Auto scan element
+
 ; @If !SmartMode
 ; @Tooltip Интервал между повторными применениями 2-й способности, пока клавиша зажата (в миллисекундах)
 ; @Value

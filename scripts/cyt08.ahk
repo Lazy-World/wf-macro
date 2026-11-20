@@ -39,6 +39,8 @@ value_x := 6 + key_size[1] + 6
 ; Smart mode shows the ammo element as an icon in the value slot
 if SmartMode
     status.new_picture("element", Cyte.icons[AmmoElement], "x" value_x " y0 w" key_size[2] " h" key_size[2])
+    if AutoScan
+        status.new_text("scan", "Auto", "accent", "left x" (value_x + key_size[2] + 6) " ym")
 else
     status.new_text("value", "", "accent", "left x" value_x " yp")
 
@@ -46,9 +48,11 @@ else
 ;;               Hotkeys               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Smart mode only polls the keys, so they still reach the game
-if SmartMode
+if SmartMode {
     SetTimer, Watch, 10
-else
+    if AutoScan
+        SetTimer, Scan, 1000
+} else
     Hotkey, *%StartStopKey%, StartStop
 return
 
@@ -85,4 +89,14 @@ Watch:
     }
     if (AutoFourth && GetKeyState(FourthKey, "P"))
         SendKey(fourthAKey)
+return
+
+Scan:
+    if !WfActive()
+        return
+    for name, spot in Cyte.pos
+        if PixelSeen(spot, Cyte.ammo[name]) {
+            AmmoElement := name
+            break
+        }
 return

@@ -25,7 +25,7 @@
 #include %A_LineFile%\..\wf.ahk
 
 global ui, status, status_head
-_MacroW := 120, _MacroHeadH := 22, _MacroRowH := 25, _MacroGap := 4
+_MacroW := 130, _MacroHeadH := 22, _MacroRowH := 25, _MacroGap := 4
 
 ui := new UiManager()
 status_head := ui.new_window("status.head", new UiVector(_MacroX(), _MacroY()), new UiVector(_MacroW, _MacroHeadH)

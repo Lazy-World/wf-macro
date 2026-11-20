@@ -36,10 +36,10 @@ UiBaseStyle() {
 UiDefaultTheme() {
     return {bg_color: "151515", bg_alpha: 170, outline_color: "879CD4", outline_alpha: 255
         , fonts: {menu_icon: {name: "menu_font", size: 15, color: "f7f2d2"}
-                , title:     {name: "Helvetica", size: 13, color: "ff68b5"}
-                , main:      {name: "Helvetica", size: 13, color: "White"}
-                , accent:    {name: "Helvetica", size: 13, color: "FFF6BD"}
-                , info:      {name: "Helvetica", size: 13, color: "FFF6BD"}}}
+                , title:     {name: "Helvetica", size: 12, color: "ff68b5"}
+                , main:      {name: "Helvetica", size: 12, color: "White"}
+                , accent:    {name: "Helvetica", size: 12, color: "FFF6BD"}
+                , info:      {name: "Helvetica", size: 12, color: "FFF6BD"}}}
 }
 
 ; Relative picture paths resolve against A_ScriptDir "\pictures\"
