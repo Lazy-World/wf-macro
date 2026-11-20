@@ -419,6 +419,21 @@ class UiText extends UiElement {
         return this
     }
 
+    ; Swaps the image of a picture control, keeping the size it was added with
+    edit_picture(control_name, file) {
+        local
+        if !this.pictures.HasKey(control_name)
+            throw Exception("Unknown picture: " control_name, -2)
+        if (this._alive) {
+            ctl := this.pictures[control_name]
+            h := this._h
+            GuiControlGet, c, %h%: Pos, % ctl.control
+            GuiControl, %h%:, % ctl.control, % "*w" cW " *h" cH " " UiPicturePath(file)
+            WinSet, Redraw, , ahk_id %h%
+        }
+        return this
+    }
+
     ; -> {control (hwnd), body, font, font_size, color, fit_x, fit_y}
     get_control(control_name) {
         if !this.controls.HasKey(control_name)
@@ -681,6 +696,11 @@ class UiWindow extends UiElement {
 
     edit_color(control_name, color) {
         this.text_window.edit_color(control_name, color)
+        return this
+    }
+
+    edit_picture(control_name, file) {
+        this.text_window.edit_picture(control_name, file)
         return this
     }
 

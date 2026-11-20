@@ -96,7 +96,10 @@ Scan:
         return
     for name, spot in Cyte.pos
         if PixelSeen(spot, Cyte.ammo[name]) {
-            AmmoElement := name
+            if (name != AmmoElement) {
+                AmmoElement := name
+                status.edit_picture("element", Cyte.icons[name])
+            }
             break
         }
 return
